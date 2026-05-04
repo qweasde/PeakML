@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Услуги{% endblock %}
+{% block meta_desc %}Услуги PeakML для игроков Mobile Legends.{% endblock %}
+
+{% block content %}
+<section style="position:relative;overflow:hidden;padding:36px 24px 56px;">
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(127,119,221,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(127,119,221,.04) 1px,transparent 1px);background-size:48px 48px;" aria-hidden="true"></div>
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 55% at 50% 0%,rgba(127,119,221,.08),transparent 68%);" aria-hidden="true"></div>
+
+  <div style="position:relative;z-index:2;max-width:1040px;margin:0 auto;">
+    <div style="max-width:640px;margin-bottom:26px;">
+      <span class="section-eyebrow">Сервисы</span>
+      <h1 style="font-family:'Russo One',sans-serif;font-size:clamp(28px,4vw,42px);line-height:1.08;margin-top:8px;">Услуги</h1>
+      <p style="color:var(--text-2);font-size:14px;line-height:1.65;margin-top:10px;">Выбирай формат поддержки под свою задачу: разбор, подготовка, сопровождение или точечная помощь.</p>
+    </div>
+
+    {% if services %}
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;">
+      {% for service in services %}
+      <article class="card" style="padding:18px;min-height:210px;display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;">
+          <div style="width:46px;height:46px;border-radius:12px;background:var(--accent-dim);border:1px solid var(--border-hover);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            {% if service.icon %}
+              <img src="{{ service.icon.url }}" alt="" style="width:30px;height:30px;object-fit:contain;">
+            {% else %}
+              <span style="font-family:'Russo One',sans-serif;font-size:18px;color:var(--accent);">{{ service.title|slice:":1"|upper }}</span>
+            {% endif %}
+          </div>
+          <div style="font-family:'Russo One',sans-serif;font-size:17px;color:var(--accent);text-align:right;line-height:1.25;">{{ service.price_display }}</div>
+        </div>
+
+        <div style="flex:1;">
+          <h2 style="font-family:'Russo One',sans-serif;font-size:18px;line-height:1.25;margin-bottom:8px;">{{ service.title }}</h2>
+          <p style="color:var(--text-2);font-size:13px;line-height:1.6;">{{ service.description }}</p>
+        </div>
+
+        <form method="POST" action="{% url 'services:order' service.pk %}">
+          {% csrf_token %}
+          <button type="submit" class="btn-primary" style="width:100%;justify-content:center;height:42px;font-size:13px;">Заказать</button>
+        </form>
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="card" style="padding:32px;text-align:center;color:var(--text-3);">
+      <p style="font-size:16px;">Услуги пока не добавлены.</p>
+      {% if staff_user.is_staff %}
+      <p style="font-size:14px;margin-top:8px;">Добавьте их в админке в разделе «Услуги».</p>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

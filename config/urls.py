@@ -11,6 +11,7 @@ urlpatterns = [
     path("meta/", include("apps.meta.urls_web", namespace="meta")),
     path("guide/", include("apps.guide.urls_web", namespace="guide")),
     path("draft/", include("apps.draft.urls", namespace="draft")),
+    path("services/", include("apps.services.urls", namespace="services")),
     path("", include("apps.core.urls", namespace="core")),
 ]
 

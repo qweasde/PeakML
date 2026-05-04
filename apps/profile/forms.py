@@ -58,7 +58,7 @@ class SiteUserLoginForm(forms.Form):
 class SiteUserProfileForm(forms.ModelForm):
     class Meta:
         model = SiteUser
-        fields = ("full_name", "email", "age", "gender", "player_role", "phone")
+        fields = ("full_name", "email", "age", "gender", "player_role", "phone", "avatar")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -2,128 +2,282 @@
 
 {% block title %}Профиль{% endblock %}
 
+{% block extra_css %}
+<style>
+.profile-field-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px 20px;
+}
+.profile-field-grid .full { grid-column: 1 / -1; }
+.form-group { margin-bottom: 0; }
+
+.accordion-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  transition: background 180ms;
+  border-radius: 0;
+}
+.accordion-header:hover { background: rgba(127,119,221,.04); }
+
+.profile-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 0 60px rgba(127,119,221,.07), 0 16px 48px rgba(0,0,0,.35);
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <section style="min-height:calc(100dvh - 64px);padding:40px 16px 80px;position:relative;overflow:hidden;">
   <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(127,119,221,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(127,119,221,.04) 1px,transparent 1px);background-size:48px 48px;" aria-hidden="true"></div>
-  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 20%,rgba(127,119,221,.08) 0%,transparent 70%);" aria-hidden="true"></div>
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(127,119,221,.1) 0%,transparent 65%);" aria-hidden="true"></div>
 
-  <div style="position:relative;z-index:2;max-width:760px;margin:0 auto;">
-    <div class="auth-card" style="padding:40px 32px;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;margin-bottom:28px;">
-        <div>
-          <p style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;">Личный кабинет</p>
-          <h1 style="font-family:'Russo One',sans-serif;font-size:32px;line-height:1.1;margin:0 0 8px;">Профиль пользователя сайта</h1>
-          <p style="font-size:14px;color:var(--text-3);max-width:520px;">Это отдельная сущность от админки. Данные пользователя сайта хранятся в собственной модели и редактируются здесь и в админ-панели.</p>
+  <div style="position:relative;z-index:2;max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:16px;">
+
+    <!-- ── Шапка профиля ── -->
+    <div class="profile-card" style="padding:24px 28px;">
+      <div style="display:flex;align-items:center;gap:0;flex-wrap:wrap;row-gap:16px;">
+
+        <!-- Аватар -->
+        <div style="position:relative;flex-shrink:0;margin-right:18px;">
+          {% if site_user.avatar %}
+            <img src="{{ site_user.avatar.url }}" alt="Фото профиля"
+              style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:1.5px solid var(--accent);box-shadow:0 0 20px rgba(127,119,221,.18);">
+          {% else %}
+            <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,rgba(127,119,221,.25),rgba(127,119,221,.06));border:1.5px solid var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Russo One',sans-serif;font-size:22px;color:var(--accent);box-shadow:0 0 20px rgba(127,119,221,.18);">
+              {{ site_user.full_name|default:site_user.email|slice:":1"|upper }}
+            </div>
+          {% endif %}
+          <span style="position:absolute;bottom:1px;right:1px;width:11px;height:11px;border-radius:50%;background:#4ade80;border:2px solid var(--surface);"></span>
         </div>
-        <div style="padding:14px 16px;border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,.02);min-width:220px;">
-          <div style="font-size:12px;color:var(--text-3);margin-bottom:6px;">Текущий аккаунт</div>
-          <div style="font-size:15px;font-weight:600;color:var(--text-1);word-break:break-word;">{{ site_user.full_name }}</div>
-          <div style="font-size:13px;color:var(--text-3);margin-top:4px;">{{ site_user.email }}</div>
+
+        <!-- Имя и email -->
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:3px;">Личный кабинет</div>
+          <div style="font-family:'Russo One',sans-serif;font-size:20px;color:var(--text-1);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ site_user.full_name|default:"—" }}</div>
+          <div style="font-size:13px;color:var(--text-3);margin-top:2px;">{{ site_user.email }}</div>
         </div>
+
+        <!-- Кнопка выйти (отдельная форма) -->
+        <form method="POST" action="{% url 'account_logout' %}" style="margin:0;margin-left:16px;flex-shrink:0;">
+          {% csrf_token %}
+          <button type="submit"
+            style="display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 16px;border-radius:10px;background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.22);color:#f87171;font-size:13px;font-family:inherit;cursor:pointer;transition:background 160ms,border-color 160ms;"
+            onmouseover="this.style.background='rgba(248,113,113,.15)';this.style.borderColor='rgba(248,113,113,.45)'"
+            onmouseout="this.style.background='rgba(248,113,113,.07)';this.style.borderColor='rgba(248,113,113,.22)'"
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Выйти
+          </button>
+        </form>
+
       </div>
-
-      <form method="POST" novalidate>
-        {% csrf_token %}
-
-        {% if form.non_field_errors %}
-        <div style="background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:13px;color:#f87171;">
-          {% for error in form.non_field_errors %}{{ error }}{% endfor %}
-        </div>
-        {% endif %}
-
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px 20px;">
-          <div class="form-group" style="grid-column:1 / -1;">
-            <label class="form-label" for="{{ form.full_name.id_for_label }}">ФИО</label>
-            {{ form.full_name }}
-            {% for error in form.full_name.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="{{ form.email.id_for_label }}">Email</label>
-            {{ form.email }}
-            {% for error in form.email.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="{{ form.phone.id_for_label }}">Телефон</label>
-            {{ form.phone }}
-            {% for error in form.phone.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="{{ form.age.id_for_label }}">Возраст</label>
-            {{ form.age }}
-            {% for error in form.age.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="{{ form.gender.id_for_label }}">Пол</label>
-            {{ form.gender }}
-            {% for error in form.gender.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
-          </div>
-          <div class="form-group" style="grid-column:1 / -1;">
-            <label class="form-label" for="{{ form.player_role.id_for_label }}">Роль</label>
-            {{ form.player_role }}
-            {% for error in form.player_role.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
-          </div>
-        </div>
-
-        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:28px;">
-          <button type="submit" class="btn-primary" style="height:50px;padding:0 24px;">Сохранить профиль</button>
-          <a href="{% url 'core:home' %}" class="btn-outline" style="height:50px;padding:0 24px;display:inline-flex;align-items:center;">На главную</a>
-        </div>
-      </form>
     </div>
 
-    <!-- Tabs -->
-    <div class="auth-card" style="margin-top:24px;padding:0;overflow:hidden;" x-data="{ tab: 'votes' }">
+    <!-- ── Форма редактирования ── -->
+    <form method="POST" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
 
-      <!-- Tab bar -->
-      <div style="padding:20px 24px 0;">
-        <div style="display:flex;gap:8px;">
-          {% for t, label in tabs %}
-          <button
-            @click="tab='{{ t }}'"
-            :class="tab==='{{ t }}' ? 'tab-btn-active' : 'tab-btn-idle'"
-            style="border:none;outline:none;border-radius:10px;padding:11px 24px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;letter-spacing:.04em;white-space:nowrap;transition:background 180ms,color 180ms;"
-          >{{ label }}</button>
-          {% endfor %}
-        </div>
+      {% if form.non_field_errors %}
+      <div style="padding:12px 16px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.28);border-radius:12px;font-size:13px;color:#f87171;margin-bottom:4px;">
+        {% for error in form.non_field_errors %}{{ error }}{% endfor %}
       </div>
-      <div style="height:1px;background:var(--border);margin-top:20px;"></div>
+      {% endif %}
+
+      <div class="profile-card" x-data="{ open: {{ form.errors|yesno:'true,false' }} }">
+
+        <!-- Заголовок аккордеона -->
+        <button type="button" class="accordion-header" @click="open = !open">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:32px;height:32px;border-radius:9px;background:rgba(127,119,221,.1);border:1px solid rgba(127,119,221,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <span style="font-size:14px;font-weight:600;color:var(--text-1);">Личные данные</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:12px;color:var(--text-3);" x-text="open ? 'Скрыть' : 'Редактировать'"></span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              style="transition:transform 220ms;flex-shrink:0;"
+              :style="open ? 'transform:rotate(180deg)' : ''"
+            ><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </button>
+
+        <!-- Раскрывающийся блок -->
+        <div
+          x-show="open"
+          x-transition:enter="transition-enter"
+          x-transition:enter-start="opacity-0"
+          x-transition:enter-end="opacity-100"
+          x-transition:leave="transition-leave"
+          x-transition:leave-start="opacity-100"
+          x-transition:leave-end="opacity-0"
+          style="border-top:1px solid var(--border);"
+        >
+          <!-- Загрузка фото -->
+          <div style="padding:20px 24px 0;" x-data="{ preview: '{% if site_user.avatar %}{{ site_user.avatar.url }}{% endif %}' }">
+            <div style="display:flex;align-items:center;gap:16px;">
+              <!-- Превью -->
+              <div style="position:relative;flex-shrink:0;">
+                <template x-if="preview">
+                  <img :src="preview" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:1.5px solid var(--accent);">
+                </template>
+                <template x-if="!preview">
+                  <div style="width:64px;height:64px;border-radius:50%;background:rgba(127,119,221,.1);border:1.5px dashed var(--border-hover);display:flex;align-items:center;justify-content:center;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  </div>
+                </template>
+              </div>
+              <!-- Кнопка выбора файла -->
+              <div>
+                <label style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 16px;border-radius:9px;background:rgba(127,119,221,.1);border:1px solid rgba(127,119,221,.25);color:var(--accent);font-size:13px;cursor:pointer;transition:background 160ms;" onmouseover="this.style.background='rgba(127,119,221,.18)'" onmouseout="this.style.background='rgba(127,119,221,.1)'">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  Загрузить фото
+                  <input type="file" name="avatar" accept="image/*" style="display:none;"
+                    @change="preview = $event.target.files[0] ? URL.createObjectURL($event.target.files[0]) : preview">
+                </label>
+                <p style="font-size:11px;color:var(--text-3);margin-top:5px;">JPG, PNG до 5 МБ</p>
+              </div>
+              <!-- Сбросить -->
+              <template x-if="preview && '{% if site_user.avatar %}yes{% endif %}' === 'yes' || preview">
+                <button type="button" style="height:32px;padding:0 12px;border-radius:8px;background:none;border:1px solid var(--border);color:var(--text-3);font-size:12px;font-family:inherit;cursor:pointer;" @click="preview=''; document.querySelector('input[name=avatar]').value=''">Сбросить</button>
+              </template>
+            </div>
+          </div>
+
+          <div style="padding:20px 24px 20px;" class="profile-field-grid">
+            <div class="form-group full">
+              <label class="form-label" for="{{ form.full_name.id_for_label }}">ФИО</label>
+              {{ form.full_name }}
+              {% for error in form.full_name.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="{{ form.email.id_for_label }}">Email</label>
+              {{ form.email }}
+              {% for error in form.email.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="{{ form.phone.id_for_label }}">Телефон</label>
+              {{ form.phone }}
+              {% for error in form.phone.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="{{ form.age.id_for_label }}">Возраст</label>
+              {{ form.age }}
+              {% for error in form.age.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="{{ form.gender.id_for_label }}">Пол</label>
+              {{ form.gender }}
+              {% for error in form.gender.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
+            </div>
+            <div class="form-group full">
+              <label class="form-label" for="{{ form.player_role.id_for_label }}">Роль</label>
+              {{ form.player_role }}
+              {% for error in form.player_role.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
+            </div>
+          </div>
+
+          <div style="padding:16px 24px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;">
+            <button type="submit" class="btn-primary" style="height:42px;padding:0 22px;font-size:13px;">Сохранить</button>
+            <a href="{% url 'core:home' %}" class="btn-outline" style="height:42px;padding:0 18px;font-size:13px;">На главную</a>
+          </div>
+        </div>
+
+      </div>
+    </form>
+
+    <!-- ── Вкладки ── -->
+    <div class="profile-card" x-data="{ tab: 'orders' }">
+
+      <div style="padding:12px 16px;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--border);">
+        {% for t, label in tabs %}
+        <button
+          @click="tab='{{ t }}'"
+          :class="tab==='{{ t }}' ? 'tab-btn-active' : 'tab-btn-idle'"
+          style="border:none;outline:none;border-radius:10px;padding:9px 20px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;letter-spacing:.04em;white-space:nowrap;transition:background 160ms,color 160ms;"
+        >{{ label }}</button>
+        {% endfor %}
+      </div>
 
       <!-- Мои голоса -->
-      <div x-show="tab==='votes'" style="padding:28px 32px;">
+      <div x-show="tab==='orders'" style="padding:24px 20px;">
+        {% if orders %}
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          {% for order in orders %}
+          <article class="card" style="padding:16px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:start;">
+            <div style="min-width:0;">
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+                <h3 style="font-family:'Russo One',sans-serif;font-size:16px;line-height:1.25;margin:0;color:var(--text-1);">{{ order.service.title }}</h3>
+                <span style="font-size:11px;color:var(--text-3);">{{ order.created_at|date:"d.m.Y H:i" }}</span>
+              </div>
+              <p style="font-size:13px;color:var(--text-2);line-height:1.55;margin-bottom:10px;">{{ order.service.description|truncatewords:22 }}</p>
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                <span style="font-family:'Russo One',sans-serif;font-size:14px;color:var(--accent);">{{ order.service.price_display }}</span>
+                <span style="font-size:12px;color:var(--text-3);">Заявка #{{ order.id }}</span>
+              </div>
+            </div>
+            <div style="justify-self:end;display:inline-flex;align-items:center;height:30px;padding:0 10px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,.03);font-size:12px;color:var(--text-2);white-space:nowrap;">
+              {{ order.get_status_display }}
+            </div>
+          </article>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align:center;padding:36px 0;">
+          <div style="width:48px;height:48px;border-radius:14px;background:rgba(127,119,221,.08);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          </div>
+          <p style="font-size:14px;color:var(--text-3);margin-bottom:14px;">У вас пока нет заказов</p>
+          <a href="{% url 'services:index' %}" class="btn-outline" style="font-size:13px;">Перейти к услугам</a>
+        </div>
+        {% endif %}
+      </div>
+
+      <div x-show="tab==='votes'" style="padding:24px 20px;">
         {% regroup votes by tier_entry.patch as votes_by_patch %}
         {% if votes_by_patch %}
           {% for group in votes_by_patch %}
-          <div style="{% if not forloop.last %}margin-bottom:36px;{% endif %}">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-              <span style="font-family:'Russo One',sans-serif;font-size:13px;color:var(--accent);">Патч {{ group.grouper.version }}</span>
+          <div style="{% if not forloop.last %}margin-bottom:32px;{% endif %}">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+              <span style="font-family:'Russo One',sans-serif;font-size:12px;color:var(--accent);letter-spacing:.06em;">Патч {{ group.grouper.version }}</span>
               <span style="height:1px;flex:1;background:var(--border);"></span>
               <span style="font-size:11px;color:var(--text-3);">{{ group.list|length }} гол.</span>
             </div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:12px;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;">
               {% for vote in group.list %}
               {% with entry=vote.tier_entry hero=vote.tier_entry.hero %}
-              <div class="card" style="padding:16px 14px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;position:relative;">
-                <!-- vote indicator -->
-                <span style="position:absolute;top:10px;right:10px;font-size:14px;line-height:1;" title="{% if vote.is_upvote %}За{% else %}Против{% endif %}">
+              <div class="card" style="padding:14px 12px;display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center;position:relative;">
+                <span style="position:absolute;top:9px;right:9px;" title="{% if vote.is_upvote %}За{% else %}Против{% endif %}">
                   {% if vote.is_upvote %}
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
                   {% else %}
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M19 12l-7 7-7-7"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M19 12l-7 7-7-7"/></svg>
                   {% endif %}
                 </span>
-                <!-- hero icon -->
-                <div style="width:48px;height:48px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <div style="width:44px;height:44px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                   {% if hero.icon %}
-                    <img src="{{ hero.icon.url }}" alt="{{ hero.name_ru }}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">
+                    <img src="{{ hero.icon.url }}" alt="{{ hero.name_ru }}" style="width:34px;height:34px;border-radius:50%;object-fit:cover;">
                   {% else %}
-                    <span style="font-family:'Russo One',sans-serif;font-size:14px;color:var(--accent);">{{ hero.name_ru|slice:":2" }}</span>
+                    <span style="font-family:'Russo One',sans-serif;font-size:13px;color:var(--accent);">{{ hero.name_ru|slice:":2" }}</span>
                   {% endif %}
                 </div>
-                <div style="font-size:13px;font-weight:600;color:var(--text-1);line-height:1.2;">{{ hero.name_ru }}</div>
+                <div style="font-size:12px;font-weight:600;color:var(--text-1);line-height:1.2;">{{ hero.name_ru }}</div>
                 {% if hero.role %}
                 <div style="font-size:11px;color:var(--text-3);">{{ hero.role.name_ru }}</div>
                 {% endif %}
-                <span class="tier-badge tier-{{ entry.tier }}">{{ entry.tier }}</span>
+                <span class="tier-badge tier-{{ entry.tier }}" style="width:28px;height:28px;font-size:13px;">{{ entry.tier }}</span>
               </div>
               {% endwith %}
               {% endfor %}
@@ -131,24 +285,30 @@
           </div>
           {% endfor %}
         {% else %}
-          <div style="text-align:center;padding:40px 0;">
-            <div style="font-size:32px;margin-bottom:12px;opacity:.4;">🗳</div>
-            <p style="font-size:14px;color:var(--text-3);">Вы ещё не голосовали за героев.</p>
-            <a href="{% url 'meta:index' %}" class="btn-outline" style="margin-top:16px;display:inline-flex;">Перейти к тирлисту →</a>
+          <div style="text-align:center;padding:36px 0;">
+            <div style="width:48px;height:48px;border-radius:14px;background:rgba(127,119,221,.08);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+            </div>
+            <p style="font-size:14px;color:var(--text-3);margin-bottom:14px;">Вы ещё не голосовали за героев</p>
+            <a href="{% url 'meta:index' %}" class="btn-outline" style="font-size:13px;">Перейти к тирлисту →</a>
           </div>
         {% endif %}
       </div>
 
       <!-- Мои турниры -->
-      <div x-show="tab==='tournaments'" style="padding:28px 32px;text-align:center;">
-        <div style="font-size:32px;margin-bottom:12px;opacity:.4;">🏆</div>
-        <p style="font-size:14px;color:var(--text-3);">Турниры появятся здесь.</p>
+      <div x-show="tab==='tournaments'" style="padding:24px 20px;text-align:center;">
+        <div style="width:48px;height:48px;border-radius:14px;background:rgba(127,119,221,.08);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
+        </div>
+        <p style="font-size:14px;color:var(--text-3);">Турниры появятся здесь</p>
       </div>
 
       <!-- Мои драфты -->
-      <div x-show="tab==='drafts'" style="padding:28px 32px;text-align:center;">
-        <div style="font-size:32px;margin-bottom:12px;opacity:.4;">📋</div>
-        <p style="font-size:14px;color:var(--text-3);">Сохранённые драфты появятся здесь.</p>
+      <div x-show="tab==='drafts'" style="padding:24px 20px;text-align:center;">
+        <div style="width:48px;height:48px;border-radius:14px;background:rgba(127,119,221,.08);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </div>
+        <p style="font-size:14px;color:var(--text-3);">Сохранённые драфты появятся здесь</p>
       </div>
 
     </div>
