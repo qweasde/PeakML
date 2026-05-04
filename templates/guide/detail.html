@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}{{ guide.title }}{% endblock %}
+{% block meta_desc %}{{ guide.excerpt|default:guide.title }}{% endblock %}
+
+{% block content %}
+<div style="max-width:800px;margin:0 auto;padding:32px 24px;">
+
+  <!-- Breadcrumb -->
+  <nav style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-3);margin-bottom:32px;" aria-label="Breadcrumb">
+    <a href="{% url 'core:home' %}" style="color:var(--text-3);text-decoration:none;">Главная</a>
+    <span>/</span>
+    <a href="{% url 'guide:index' %}" style="color:var(--text-3);text-decoration:none;">Гайды</a>
+    {% if guide.series %}
+    <span>/</span>
+    <span style="color:var(--text-2);">{{ guide.series.title }}</span>
+    {% endif %}
+  </nav>
+
+  <!-- Meta -->
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:20px;">
+    <span style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+      {% if guide.difficulty == 'beginner' %}color:#4ade80{% elif guide.difficulty == 'intermediate' %}color:var(--accent){% else %}color:#f87171{% endif %}">
+      {% if guide.difficulty == 'beginner' %}Новичок{% elif guide.difficulty == 'intermediate' %}Средний{% else %}Продвинутый{% endif %}
+    </span>
+    <span style="font-size:11px;color:var(--text-3);">{{ guide.views }} просмотров</span>
+    <span style="font-size:11px;color:var(--text-3);">Обновлено {{ guide.updated_at|date:"d.m.Y" }}</span>
+  </div>
+
+  <h1 style="font-family:'Russo One',sans-serif;font-size:clamp(24px,4vw,38px);line-height:1.15;margin-bottom:16px;">{{ guide.title }}</h1>
+
+  {% if guide.excerpt %}
+  <p style="font-size:17px;color:var(--text-2);line-height:1.7;margin-bottom:40px;border-left:3px solid var(--accent);padding-left:20px;">{{ guide.excerpt }}</p>
+  {% endif %}
+
+  <!-- Content -->
+  <div style="
+    font-size:16px;line-height:1.8;color:var(--text-1);
+  " class="guide-content">
+    {{ content_html|safe }}
+  </div>
+
+  <!-- Related -->
+  {% if related %}
+  <div style="margin-top:64px;padding-top:40px;border-top:1px solid var(--border);">
+    <h2 style="font-family:'Russo One',sans-serif;font-size:20px;margin-bottom:20px;">Из той же серии</h2>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      {% for g in related %}
+      <a href="{% url 'guide:detail' g.slug %}" class="card" style="padding:16px 20px;text-decoration:none;display:block;">
+        <span style="font-family:'Russo One',sans-serif;font-size:14px;color:var(--text-1);">{{ g.title }}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+
+<style>
+.guide-content h2 { font-family:'Russo One',sans-serif; font-size:22px; color:var(--text-1); margin:2em 0 0.8em; }
+.guide-content h3 { font-family:'Russo One',sans-serif; font-size:18px; color:var(--text-1); margin:1.6em 0 0.6em; }
+.guide-content p  { margin-bottom:1.2em; color:var(--text-2); }
+.guide-content ul, .guide-content ol { padding-left:1.5em; margin-bottom:1.2em; color:var(--text-2); }
+.guide-content li { margin-bottom:0.4em; }
+.guide-content code { background:var(--surface); border:1px solid var(--border); border-radius:4px; padding:2px 6px; font-size:14px; color:var(--accent); }
+.guide-content pre  { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:16px; overflow-x:auto; margin-bottom:1.2em; }
+.guide-content strong { color:var(--text-1); }
+.guide-content a { color:var(--accent); }
+</style>
+{% endblock %}
