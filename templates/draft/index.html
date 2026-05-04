@@ -1,0 +1,487 @@
+{% extends "base.html" %}
+{% block title %}Анализ драфта{% endblock %}
+
+{% block extra_css %}
+<style>
+.draft-slot {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(255,255,255,.03);
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: border-color 180ms, background 180ms;
+  position: relative;
+}
+.draft-slot:hover { border-color: var(--accent); background: rgba(127,119,221,.07); }
+.draft-slot.filled { cursor: default; }
+.draft-slot.filled:hover { border-color: var(--border); background: rgba(255,255,255,.03); }
+.draft-slot-empty {
+  width: 48px; height: 48px; border-radius: 50%;
+  border: 2px dashed var(--border);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  color: var(--text-3); font-size: 22px; line-height: 1;
+}
+.draft-slot-icon {
+  width: 48px; height: 48px; border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--accent-dim);
+  overflow: hidden; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.draft-slot-icon img { width: 100%; height: 100%; object-fit: cover; }
+.tier-dot { display:inline-block;width:8px;height:8px;border-radius:50%;flex-shrink:0; }
+.result-bar-wrap { height: 10px; border-radius: 6px; background: rgba(255,255,255,.07); overflow: hidden; }
+.result-bar { height: 100%; border-radius: 6px; transition: width 600ms cubic-bezier(.22,1,.36,1); }
+
+/* Modal */
+.picker-overlay {
+  position: fixed; inset: 0; z-index: 600;
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+}
+.picker-backdrop {
+  position: absolute; inset: 0; background: rgba(0,0,0,.75);
+}
+.picker-modal {
+  position: relative; z-index: 1;
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  width: 100%; max-width: 680px;
+  max-height: 80dvh;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.picker-hero {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 12px 8px; border-radius: 12px;
+  border: 1px solid transparent;
+  cursor: pointer; text-align: center;
+  transition: border-color 150ms, background 150ms;
+}
+.picker-hero:hover { border-color: var(--accent); background: rgba(127,119,221,.1); }
+.tooltip-wrap { position: relative; width: 100%; }
+.tooltip-box {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-deep, #111);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 12px;
+  color: var(--text-2);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms;
+  z-index: 10;
+}
+.tooltip-wrap:hover .tooltip-box { opacity: 1; }
+
+.pro-tooltip-wrap .pro-tooltip {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a2e;
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  color: #d8b4fe;
+  font-size: 12px;
+  font-family: inherit;
+  letter-spacing: .04em;
+  white-space: nowrap;
+  padding: 6px 12px;
+  border-radius: 8px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 180ms;
+  z-index: 20;
+}
+.pro-tooltip-wrap .pro-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-bottom-color: rgba(168, 85, 247, 0.4);
+}
+.pro-tooltip-wrap:hover .pro-tooltip { opacity: 1; }
+</style>
+{% endblock %}
+
+{% block content %}
+<section
+  x-data="draftApp()"
+  style="min-height:calc(100dvh - 64px);padding:40px 16px 80px;position:relative;overflow:hidden;"
+>
+  <!-- bg decorations -->
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(127,119,221,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(127,119,221,.04) 1px,transparent 1px);background-size:48px 48px;" aria-hidden="true"></div>
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 10%,rgba(127,119,221,.07) 0%,transparent 70%);" aria-hidden="true"></div>
+
+  <div style="position:relative;z-index:2;max-width:1100px;margin:0 auto;">
+
+    <!-- Header -->
+    <div style="text-align:center;margin-bottom:48px;">
+      <p style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;">Инструмент</p>
+      <h1 style="font-family:'Russo One',sans-serif;font-size:clamp(28px,5vw,44px);line-height:1.1;margin:0 0 12px;">Анализ драфта</h1>
+      <p style="font-size:14px;color:var(--text-3);">Добавьте героев в обе команды и нажмите «Анализировать»</p>
+    </div>
+
+    <!-- Teams + Analyze -->
+    <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:24px;align-items:start;">
+
+      <!-- Team A -->
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+          <span style="width:10px;height:10px;border-radius:50%;background:#7f77dd;box-shadow:0 0 8px #7f77dd;flex-shrink:0;"></span>
+          <span style="font-family:'Russo One',sans-serif;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-1);">Ваша команда</span>
+          <span style="font-size:12px;color:var(--text-3);" x-text="'(' + teamA.filter(Boolean).length + '/5)'"></span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <template x-for="(slot, i) in teamA" :key="'a'+i">
+            <div
+              :class="slot ? 'draft-slot filled' : 'draft-slot'"
+              @click="slot ? null : openPicker('a', i)"
+            >
+              <template x-if="!slot">
+                <div class="draft-slot-empty">+</div>
+              </template>
+              <template x-if="slot">
+                <div class="draft-slot-icon">
+                  <template x-if="slot.icon_url">
+                    <img :src="slot.icon_url" :alt="slot.name_ru">
+                  </template>
+                  <template x-if="!slot.icon_url">
+                    <span style="font-family:'Russo One',sans-serif;font-size:14px;color:var(--accent);" x-text="slot.name_ru.slice(0,2)"></span>
+                  </template>
+                </div>
+              </template>
+              <template x-if="slot">
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:14px;font-weight:600;color:var(--text-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" x-text="slot.name_ru"></div>
+                  <div style="font-size:12px;color:var(--text-3);" x-text="slot.role_name || '—'"></div>
+                </div>
+              </template>
+              <template x-if="!slot">
+                <span style="font-size:13px;color:var(--text-3);">Выбрать героя</span>
+              </template>
+              <template x-if="slot">
+                <button
+                  @click.stop="removeHero('a', i)"
+                  style="margin-left:auto;background:none;border:none;color:var(--text-3);cursor:pointer;font-size:18px;line-height:1;padding:4px;border-radius:6px;"
+                  title="Убрать"
+                >×</button>
+              </template>
+            </div>
+          </template>
+        </div>
+      </div>
+
+      <!-- Center: VS + button -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding-top:42px;min-width:180px;">
+        <div style="font-family:'Russo One',sans-serif;font-size:28px;color:var(--text-3);letter-spacing:.06em;">VS</div>
+        <button
+          @click="analyze()"
+          :disabled="!canAnalyze || loading"
+          class="btn-primary"
+          style="width:100%;padding:14px 24px;font-size:13px;letter-spacing:.08em;transition:opacity 200ms;"
+          :style="(!canAnalyze || loading) ? 'opacity:.4;cursor:not-allowed;' : ''"
+        >
+          <span x-text="loading ? '...' : 'Анализировать'"></span>
+        </button>
+        <div style="position:relative;width:100%;" class="pro-tooltip-wrap">
+          <button
+            disabled
+            style="width:100%;padding:12px 20px;font-size:12px;letter-spacing:.06em;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;color:var(--text-3);cursor:not-allowed;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;opacity:.7;"
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span>Детальный анализ</span>
+          </button>
+          <div class="pro-tooltip">Доступно с подпиской PRO</div>
+        </div>
+      </div>
+
+      <!-- Team B -->
+      <div>
+        <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-bottom:16px;">
+          <span style="font-size:12px;color:var(--text-3);" x-text="'(' + teamB.filter(Boolean).length + '/5)'"></span>
+          <span style="font-family:'Russo One',sans-serif;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-1);">Противники</span>
+          <span style="width:10px;height:10px;border-radius:50%;background:#f87171;box-shadow:0 0 8px #f87171;flex-shrink:0;"></span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <template x-for="(slot, i) in teamB" :key="'b'+i">
+            <div
+              :class="slot ? 'draft-slot filled' : 'draft-slot'"
+              @click="slot ? null : openPicker('b', i)"
+            >
+              <template x-if="!slot">
+                <div class="draft-slot-empty">+</div>
+              </template>
+              <template x-if="slot">
+                <div class="draft-slot-icon">
+                  <template x-if="slot.icon_url">
+                    <img :src="slot.icon_url" :alt="slot.name_ru">
+                  </template>
+                  <template x-if="!slot.icon_url">
+                    <span style="font-family:'Russo One',sans-serif;font-size:14px;color:#f87171;" x-text="slot.name_ru.slice(0,2)"></span>
+                  </template>
+                </div>
+              </template>
+              <template x-if="slot">
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:14px;font-weight:600;color:var(--text-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" x-text="slot.name_ru"></div>
+                  <div style="font-size:12px;color:var(--text-3);" x-text="slot.role_name || '—'"></div>
+                </div>
+              </template>
+              <template x-if="!slot">
+                <span style="font-size:13px;color:var(--text-3);">Выбрать героя</span>
+              </template>
+              <template x-if="slot">
+                <button
+                  @click.stop="removeHero('b', i)"
+                  style="margin-left:auto;background:none;border:none;color:var(--text-3);cursor:pointer;font-size:18px;line-height:1;padding:4px;border-radius:6px;"
+                  title="Убрать"
+                >×</button>
+              </template>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div x-show="result" x-transition style="margin-top:48px;">
+      <div class="auth-card" style="padding:32px;">
+
+        <!-- Winner banner -->
+        <div style="text-align:center;margin-bottom:32px;">
+          <template x-if="result && result.winner === 'draw'">
+            <div>
+              <p style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);margin-bottom:8px;">Результат</p>
+              <p style="font-family:'Russo One',sans-serif;font-size:24px;color:var(--text-2);">Равный драфт</p>
+            </div>
+          </template>
+          <template x-if="result && result.winner === 'a'">
+            <div>
+              <p style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);margin-bottom:8px;">Преимущество</p>
+              <p style="font-family:'Russo One',sans-serif;font-size:24px;color:#7f77dd;">Ваша команда <span x-text="result ? '+' + result.advantage_pct + '%' : ''"></span></p>
+            </div>
+          </template>
+          <template x-if="result && result.winner === 'b'">
+            <div>
+              <p style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);margin-bottom:8px;">Преимущество</p>
+              <p style="font-family:'Russo One',sans-serif;font-size:24px;color:#f87171;">Противники <span x-text="result ? '+' + result.advantage_pct + '%' : ''"></span></p>
+            </div>
+          </template>
+        </div>
+
+        <!-- Score bars -->
+        <div style="margin-bottom:32px;">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;">
+            <span style="font-size:22px;font-family:'Russo One',sans-serif;color:#7f77dd;" x-text="result ? result.team_a.total : ''"></span>
+            <span style="font-size:12px;color:var(--text-3);">очков</span>
+            <span style="font-size:22px;font-family:'Russo One',sans-serif;color:#f87171;" x-text="result ? result.team_b.total : ''"></span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+            <div class="result-bar-wrap">
+              <div class="result-bar" style="background:#7f77dd;" :style="result ? 'width:' + barWidth('a') + '%' : 'width:0'"></div>
+            </div>
+            <div class="result-bar-wrap">
+              <div class="result-bar" style="background:#f87171;margin-left:auto;" :style="result ? 'width:' + barWidth('b') + '%' : 'width:0'"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Breakdown table -->
+        <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:4px 16px;font-size:13px;">
+          <!-- Header -->
+          <div style="font-size:11px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;padding-bottom:8px;border-bottom:1px solid var(--border);">Ваша команда</div>
+          <div style="font-size:11px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;text-align:center;padding-bottom:8px;border-bottom:1px solid var(--border);">Компонент</div>
+          <div style="font-size:11px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;text-align:right;padding-bottom:8px;border-bottom:1px solid var(--border);">Противники</div>
+
+          <!-- Rows -->
+          <template x-for="row in breakdownRows" :key="row.key">
+            <div style="display:contents;">
+              <div style="padding:8px 0;color:var(--text-1);font-weight:500;" x-text="result ? result.team_a[row.key] : ''"></div>
+              <div style="padding:8px 0;color:var(--text-3);text-align:center;" x-text="row.label"></div>
+              <div style="padding:8px 0;color:var(--text-1);font-weight:500;text-align:right;" x-text="result ? result.team_b[row.key] : ''"></div>
+            </div>
+          </template>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Hero Picker Modal -->
+  <div class="picker-overlay" x-show="picker.open" x-transition.opacity style="display:none;">
+    <div class="picker-backdrop" @click="picker.open = false"></div>
+    <div class="picker-modal">
+
+      <!-- Modal header -->
+      <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);flex-shrink:0;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+          <h2 style="font-family:'Russo One',sans-serif;font-size:18px;margin:0;flex:1;">Выбор героя</h2>
+          <button @click="picker.open = false" style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:22px;line-height:1;padding:4px;">×</button>
+        </div>
+        <input
+          x-model="picker.search"
+          placeholder="Поиск по имени..."
+          style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:14px;color:var(--text-1);outline:none;font-family:inherit;"
+          @focus="$el.style.borderColor='var(--accent)'"
+          @blur="$el.style.borderColor='var(--border)'"
+        >
+        <!-- Role filter -->
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;">
+          <button
+            @click="picker.role = ''"
+            :class="picker.role === '' ? 'tab-btn-active' : 'tab-btn-idle'"
+            style="border:none;outline:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;"
+          >Все</button>
+          {% for r in roles %}
+          <button
+            @click="picker.role = '{{ r.role__slug }}'"
+            :class="picker.role === '{{ r.role__slug }}' ? 'tab-btn-active' : 'tab-btn-idle'"
+            style="border:none;outline:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;"
+          >{{ r.role__name_ru }}</button>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Hero grid -->
+      <div style="padding:16px 24px;overflow-y:auto;flex:1;">
+        <template x-if="filteredHeroes.length === 0">
+          <p style="text-align:center;color:var(--text-3);padding:32px 0;">Герои не найдены</p>
+        </template>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;">
+          <template x-for="hero in filteredHeroes" :key="hero.id">
+            <div class="picker-hero" @click="selectHero(hero)">
+              <div style="width:52px;height:52px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;">
+                <template x-if="hero.icon_url">
+                  <img :src="hero.icon_url" :alt="hero.name_ru" style="width:100%;height:100%;object-fit:cover;">
+                </template>
+                <template x-if="!hero.icon_url">
+                  <span style="font-family:'Russo One',sans-serif;font-size:14px;color:var(--accent);" x-text="hero.name_ru.slice(0,2)"></span>
+                </template>
+              </div>
+              <span style="font-size:11px;color:var(--text-2);line-height:1.3;word-break:break-word;" x-text="hero.name_ru"></span>
+            </div>
+          </template>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function draftApp() {
+  var ALL_HEROES = {{ heroes_json|safe }};
+
+  return {
+    teamA: [null, null, null, null, null],
+    teamB: [null, null, null, null, null],
+    picker: { open: false, team: null, slot: null, search: '', role: '' },
+    result: null,
+    loading: false,
+
+    get canAnalyze() {
+      return this.teamA.some(Boolean) && this.teamB.some(Boolean);
+    },
+
+    get filteredHeroes() {
+      var pickedIds = this.teamA.concat(this.teamB)
+        .filter(Boolean).map(function(h) { return h.id; });
+      var search = this.picker.search.toLowerCase();
+      var role = this.picker.role;
+      return ALL_HEROES.filter(function(h) {
+        if (pickedIds.indexOf(h.id) !== -1) return false;
+        if (role && h.role_slug !== role) return false;
+        if (search && h.name_ru.toLowerCase().indexOf(search) === -1) return false;
+        return true;
+      });
+    },
+
+    breakdownRows: [
+      { key: 'meta',      label: 'Мета-счёт' },
+      { key: 'roles',     label: 'Покрытие ролей' },
+      { key: 'counters',  label: 'Контр-пики' },
+      { key: 'synergies', label: 'Синергии' },
+      { key: 'damage',    label: 'Баланс урона' },
+      { key: 'phase',     label: 'Силён на стадии' },
+      { key: 'cc',        label: 'Контроль' },
+      { key: 'sustain',   label: 'Восстановление' },
+      { key: 'mobility',  label: 'Мобильность' },
+    ],
+
+    barWidth: function(team) {
+      if (!this.result) return 0;
+      var a = this.result.team_a.total;
+      var b = this.result.team_b.total;
+      var total = a + b;
+      if (!total) return 50;
+      return Math.round((team === 'a' ? a : b) / total * 100);
+    },
+
+    openPicker: function(team, slot) {
+      this.picker = { open: true, team: team, slot: slot, search: '', role: '' };
+    },
+
+    selectHero: function(hero) {
+      if (this.picker.team === 'a') {
+        this.teamA[this.picker.slot] = hero;
+        this.teamA = this.teamA.slice();
+      } else {
+        this.teamB[this.picker.slot] = hero;
+        this.teamB = this.teamB.slice();
+      }
+      this.picker.open = false;
+      this.result = null;
+    },
+
+    removeHero: function(team, i) {
+      if (team === 'a') {
+        this.teamA[i] = null;
+        this.teamA = this.teamA.slice();
+      } else {
+        this.teamB[i] = null;
+        this.teamB = this.teamB.slice();
+      }
+      this.result = null;
+    },
+
+    analyze: async function() {
+      if (!this.canAnalyze || this.loading) return;
+      this.loading = true;
+      var teamAIds = this.teamA.filter(Boolean).map(function(h) { return h.id; });
+      var teamBIds = this.teamB.filter(Boolean).map(function(h) { return h.id; });
+      try {
+        var resp = await fetch('{% url "draft:analyze" %}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.cookie.match(/csrftoken=([^;]+)/)?.[1] || ''
+          },
+          body: JSON.stringify({ team_a: teamAIds, team_b: teamBIds })
+        });
+        this.result = await resp.json();
+      } finally {
+        this.loading = false;
+      }
+    },
+  };
+}
+</script>
+{% endblock %}

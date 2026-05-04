@@ -10,13 +10,14 @@
 
   <div style="display:flex;align-items:center;justify-content:space-between;height:64px;max-width:1160px;margin:0 auto;padding:0 24px;">
 
-    <a href="{% url 'core:home' %}" style="font-family:'Russo One',sans-serif;font-size:22px;color:var(--accent);text-decoration:none;letter-spacing:.04em;text-shadow:0 0 24px var(--accent-glow);flex-shrink:0;" aria-label="PeakML — главная">
-      Peak<span style="color:var(--text-1)">ML</span>
+    <a href="{% url 'core:home' %}" style="display:flex;align-items:center;gap:8px;font-family:'Russo One',sans-serif;font-size:22px;color:var(--accent);text-decoration:none;letter-spacing:.04em;text-shadow:0 0 24px var(--accent-glow);flex-shrink:0;" aria-label="{{ site_name }} — главная">
+      {% if site_config.logo_icon %}<span style="position:relative;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;flex-shrink:0;" aria-hidden="true"><span style="position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,var(--accent) 0%,transparent 70%);filter:blur(10px);opacity:.55;"></span><img src="{{ site_config.logo_icon.url }}" alt="" class="logo-spin" style="position:relative;height:40px;width:40px;object-fit:contain;" /></span>{% endif %}
+      {{ site_name }}
     </a>
 
     <ul style="display:flex;align-items:center;gap:28px;list-style:none;" class="hidden md:flex">
       <li><a href="{% url 'meta:index' %}" class="nav-link {% if request.resolver_match.namespace == 'meta' %}active{% endif %}">Мета</a></li>
-      <li><a href="#" class="nav-link">Драфт</a></li>
+      <li><a href="{% url 'draft:index' %}" class="nav-link {% if request.resolver_match.namespace == 'draft' %}active{% endif %}">Драфт</a></li>
       <li><a href="#" class="nav-link">Билды</a></li>
       <li><a href="{% url 'guide:index' %}" class="nav-link {% if request.resolver_match.namespace == 'guide' %}active{% endif %}">Гайды</a></li>
       <li><a href="#" class="nav-link">Турниры</a></li>
@@ -24,14 +25,16 @@
 
     <div style="display:flex;align-items:center;gap:12px;">
       {% if user.is_authenticated %}
-        <span style="font-size:13px;color:var(--text-2);">{{ user.email }}</span>
-        <a href="{% url 'account_logout' %}" class="btn-outline" style="padding:8px 16px;font-size:13px;">Выйти</a>
+        <a href="{% url 'profile:detail' %}" style="font-size:13px;color:var(--text-2);text-decoration:none;">{{ user.full_name|default:user.email }}</a>
+        <form method="POST" action="{% url 'account_logout' %}" style="margin:0;">
+          {% csrf_token %}
+          <button type="submit" class="btn-outline" style="padding:8px 16px;font-size:13px;">Выйти</button>
+        </form>
       {% else %}
         <a href="{% url 'account_login' %}" class="nav-link hidden md:inline">Войти</a>
         <a href="{% url 'account_signup' %}" class="btn-outline" style="padding:8px 16px;font-size:13px;">Регистрация</a>
       {% endif %}
 
-      <!-- Burger -->
       <button @click="open = !open" :aria-expanded="open.toString()" aria-label="Меню"
         style="display:flex;flex-direction:column;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;padding:10px;min-width:44px;min-height:44px;"
         class="md:hidden">
@@ -45,16 +48,23 @@
     </div>
   </div>
 
-  <!-- Mobile menu -->
   <div x-show="open" x-transition style="background:var(--bg-deep);border-top:1px solid var(--border);padding:20px 24px 24px;" class="md:hidden">
     <ul style="list-style:none;display:flex;flex-direction:column;gap:4px;margin-bottom:20px;">
       <li><a href="{% url 'meta:index' %}" @click="open=false" style="display:block;color:var(--text-2);text-decoration:none;font-size:15px;font-weight:500;padding:12px 0;border-bottom:1px solid var(--border);">Мета</a></li>
-      <li><a href="#" @click="open=false" style="display:block;color:var(--text-2);text-decoration:none;font-size:15px;font-weight:500;padding:12px 0;border-bottom:1px solid var(--border);">Драфт</a></li>
+      <li><a href="{% url 'draft:index' %}" @click="open=false" style="display:block;color:var(--text-2);text-decoration:none;font-size:15px;font-weight:500;padding:12px 0;border-bottom:1px solid var(--border);">Драфт</a></li>
       <li><a href="#" @click="open=false" style="display:block;color:var(--text-2);text-decoration:none;font-size:15px;font-weight:500;padding:12px 0;border-bottom:1px solid var(--border);">Билды</a></li>
       <li><a href="{% url 'guide:index' %}" @click="open=false" style="display:block;color:var(--text-2);text-decoration:none;font-size:15px;font-weight:500;padding:12px 0;border-bottom:1px solid var(--border);">Гайды</a></li>
       <li><a href="#" @click="open=false" style="display:block;color:var(--text-2);text-decoration:none;font-size:15px;font-weight:500;padding:12px 0;">Турниры</a></li>
     </ul>
-    {% if not user.is_authenticated %}
+    {% if user.is_authenticated %}
+      <div style="display:flex;flex-direction:column;gap:12px;margin-top:20px;padding-top:20px;border-top:1px solid var(--border);">
+        <a href="{% url 'profile:detail' %}" @click="open=false" style="font-size:13px;color:var(--text-2);text-decoration:none;">{{ user.full_name|default:user.email }}</a>
+        <form method="POST" action="{% url 'account_logout' %}" style="margin:0;">
+          {% csrf_token %}
+          <button type="submit" class="btn-outline" style="width:100%;justify-content:center;">Выйти</button>
+        </form>
+      </div>
+    {% else %}
       <a href="{% url 'account_signup' %}" class="btn-primary" style="width:100%;justify-content:center;">Зарегистрироваться</a>
     {% endif %}
   </div>

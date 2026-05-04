@@ -1,18 +1,33 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% block title %}PeakML{% endblock %} — PeakML</title>
+  <title>{% block title %}{{ site_config.browser_title|default:"PeakML" }}{% endblock %}</title>
   <meta name="description" content="{% block meta_desc %}Полный инструментарий для игроков в Mobile Legends: Bang Bang{% endblock %}" />
+
+  {% if site_config.favicon %}<link rel="icon" type="image/x-icon" href="{{ site_config.favicon.url }}" />{% endif %}
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&family=Russo+One&display=swap" rel="stylesheet" />
 
-  {% load static %}
   <link rel="stylesheet" href="{% static 'css/main.css' %}" />
 
+  <style>
+    .tab-btn-active { background: rgba(127,119,221,.2); color: #7f77dd; }
+    .tab-btn-idle   { background: rgba(255,255,255,.05); color: var(--text-3); }
+    .tab-btn-idle:hover { color: var(--text-1); }
+    @keyframes logo-to-cyan {
+      from { transform: rotate(0deg);   filter: none; }
+      to   { transform: rotate(90deg);  filter: hue-rotate(150deg) brightness(1.7) drop-shadow(0 0 10px #00e5ff); }
+    }
+    @keyframes logo-from-cyan {
+      from { transform: rotate(90deg);  filter: hue-rotate(150deg) brightness(1.7) drop-shadow(0 0 10px #00e5ff); }
+      to   { transform: rotate(180deg); filter: none; }
+    }
+  </style>
   {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -44,6 +59,23 @@
         navbar.classList.toggle('navbar--scrolled', window.scrollY > 20);
       }, { passive: true });
     }
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var img = document.querySelector('.logo-spin');
+      if (!img) return;
+      var link = img.closest('a');
+      link.addEventListener('mouseenter', function () {
+        img.style.animation = 'none';
+        img.offsetWidth;
+        img.style.animation = 'logo-to-cyan 300ms ease forwards';
+      });
+      link.addEventListener('mouseleave', function () {
+        img.style.animation = 'none';
+        img.offsetWidth;
+        img.style.animation = 'logo-from-cyan 300ms ease forwards';
+      });
+    });
   </script>
   {% block extra_js %}{% endblock %}
 </body>

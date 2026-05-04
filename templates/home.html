@@ -15,7 +15,7 @@
       {% if current_patch %}Сезон · Патч {{ current_patch.version }}{% else %}Сезон 34 · Всегда актуально{% endif %}
     </div>
 
-    <h1 style="font-family:'Russo One',sans-serif;font-size:clamp(44px,9vw,88px);line-height:1.02;letter-spacing:-.02em;margin-bottom:26px;">
+    <h1 id="hero-title" style="font-family:'Russo One',sans-serif;font-size:clamp(44px,9vw,88px);line-height:1.02;letter-spacing:-.02em;margin-bottom:26px;opacity:0;">
       Доминируй<br>
       <span style="color:var(--accent);text-shadow:0 0 48px rgba(127,119,221,.45);">в каждой игре</span>
     </h1>
@@ -35,15 +35,15 @@
     </div>
 
     <div style="display:flex;align-items:center;justify-content:center;flex-wrap:wrap;">
-      <div style="padding:0 36px;text-align:center;border-right:1px solid var(--border);">
+      <div class="stat-block" style="animation-delay:.2s;padding:0 36px;text-align:center;border-right:1px solid var(--border);">
         <div style="font-family:'Russo One',sans-serif;font-size:clamp(20px,3vw,28px);line-height:1.1;margin-bottom:4px;">50<span style="color:var(--accent)">K+</span></div>
         <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-3);">Игроков</div>
       </div>
-      <div style="padding:0 36px;text-align:center;border-right:1px solid var(--border);">
+      <div class="stat-block" style="animation-delay:.42s;padding:0 36px;text-align:center;border-right:1px solid var(--border);">
         <div style="font-family:'Russo One',sans-serif;font-size:clamp(20px,3vw,28px);line-height:1.1;margin-bottom:4px;">120<span style="color:var(--accent)">+</span></div>
         <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-3);">Героев</div>
       </div>
-      <div style="padding:0 36px;text-align:center;">
+      <div class="stat-block" style="animation-delay:.64s;padding:0 36px;text-align:center;">
         <div style="font-family:'Russo One',sans-serif;font-size:clamp(20px,3vw,28px);line-height:1.1;margin-bottom:4px;color:var(--accent);">Live</div>
         <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-3);">Данные патча</div>
       </div>
@@ -84,6 +84,55 @@
 {% endif %}
 
 <style>
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+@keyframes blink    { 0%,100%{opacity:1} 50%{opacity:.3} }
+@keyframes stat-in  { from{opacity:0;transform:translateY(28px) scale(.88)} to{opacity:1;transform:translateY(0) scale(1)} }
+@keyframes cur-blink{ 0%,100%{opacity:1} 50%{opacity:0} }
+.stat-block {
+  opacity: 0;
+  animation: stat-in .65s cubic-bezier(.22,1,.36,1) forwards;
+}
 </style>
+
+{% block extra_js %}
+<script>
+(function () {
+  /* ── Typewriter ──────────────────────────────── */
+  var el = document.getElementById('hero-title');
+  if (!el) return;
+
+  var line1  = 'Доминируй';
+  var line2  = 'в каждой игре';
+  var aStyle = 'color:var(--accent);text-shadow:0 0 48px rgba(127,119,221,.45);';
+  var cur    = '<span style="display:inline-block;width:3px;height:.78em;background:var(--accent);border-radius:2px;margin-left:4px;vertical-align:middle;animation:cur-blink .9s step-end infinite;"></span>';
+  var full   = line1 + '<br><span style="' + aStyle + '">' + line2 + '</span>';
+
+  /* measure natural height BEFORE clearing content (opacity:0 doesn't affect layout) */
+  var h = el.offsetHeight;
+  if (h > 0) el.style.minHeight = h + 'px';
+  el.style.opacity = '1';
+  el.innerHTML = cur;
+
+  function render(step) {
+    var html = line1.slice(0, Math.min(step, line1.length));
+    if (step >= line1.length) {
+      html += '<br><span style="' + aStyle + '">' + line2.slice(0, step - line1.length) + '</span>';
+    }
+    el.innerHTML = html + cur;
+  }
+
+  var total = line1.length + line2.length;
+  var step  = 0;
+
+  function tick() {
+    step++;
+    render(step);
+    if (step < total) {
+      setTimeout(tick, step < line1.length ? 85 : 72);
+    }
+  }
+
+  setTimeout(tick, 320);
+})();
+</script>
+{% endblock %}
 {% endblock %}

@@ -1,0 +1,35 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">Главная</a>
+  &rsaquo; {{ title }}
+</div>
+{% endblock %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+{% if description %}
+<p style="color:#666;margin-bottom:20px;">{{ description }}</p>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  <div class="form-row">
+    {% for field in form %}
+    <p>
+      {{ field.label_tag }}
+      {{ field }}
+      {% if field.errors %}<p class="errornote">{{ field.errors }}</p>{% endif %}
+    </p>
+    {% endfor %}
+  </div>
+  <div class="submit-row">
+    <input type="submit" value="Импортировать" class="default">
+    <a href=".." class="closelink">Отмена</a>
+  </div>
+</form>
+{% endblock %}

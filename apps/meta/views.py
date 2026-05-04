@@ -1,11 +1,11 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-from django.contrib.auth.decorators import login_required
 from rest_framework import viewsets, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from apps.profile.auth import site_login_required
 from .models import Hero, Role, Patch, TierEntry, HeroVote
 from .serializers import TierEntrySerializer, HeroSerializer, PatchSerializer
 
@@ -31,10 +31,10 @@ def tier_list(request):
 
     # Голоса текущего пользователя
     user_votes = {}
-    if request.user.is_authenticated:
+    if request.site_user.is_authenticated:
         user_votes = dict(
             HeroVote.objects.filter(
-                user=request.user,
+                user=request.site_user,
                 tier_entry__patch=patch,
             ).values_list("tier_entry_id", "is_upvote")
         )
@@ -51,7 +51,7 @@ def tier_list(request):
 
 
 @require_POST
-@login_required
+@site_login_required
 def vote(request, entry_id):
     """HTMX endpoint для голосования."""
     entry = get_object_or_404(TierEntry, pk=entry_id)
@@ -59,7 +59,7 @@ def vote(request, entry_id):
     is_upvote = direction == "up"
 
     vote_obj, created = HeroVote.objects.get_or_create(
-        user=request.user,
+        user=request.site_user,
         tier_entry=entry,
         defaults={"is_upvote": is_upvote},
     )
@@ -91,7 +91,7 @@ def vote(request, entry_id):
     entry.refresh_from_db()
     return render(request, "meta/partials/vote_buttons.html", {
         "entry": entry,
-        "user_vote": is_upvote if HeroVote.objects.filter(user=request.user, tier_entry=entry).exists() else None,
+        "user_vote": is_upvote if HeroVote.objects.filter(user=request.site_user, tier_entry=entry).exists() else None,
     })
 
 

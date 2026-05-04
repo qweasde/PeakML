@@ -5,7 +5,6 @@
 {% block content %}
 <div style="max-width:1160px;margin:0 auto;padding:32px 24px;">
 
-  <!-- Header -->
   <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:20px;margin-bottom:40px;">
     <div>
       <span class="section-eyebrow">{% if patch %}Патч {{ patch.version }}{% endif %}</span>
@@ -13,7 +12,6 @@
       <p style="color:var(--text-2);font-size:15px;margin-top:8px;">Обновляется сообществом после каждого патча.</p>
     </div>
 
-    <!-- Filters -->
     <form method="get" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
       {% if patches %}
       <select name="patch" onchange="this.form.submit()" style="background:var(--surface);border:1px solid var(--border);color:var(--text-1);border-radius:8px;padding:8px 14px;font-family:inherit;font-size:13px;cursor:pointer;">
@@ -32,7 +30,6 @@
     </form>
   </div>
 
-  <!-- Tier rows -->
   {% for tier, tier_entries in entries.items %}
   {% if tier_entries %}
   <div style="margin-bottom:32px;">
@@ -58,7 +55,6 @@
           </div>
         </div>
 
-        <!-- Vote buttons — HTMX -->
         <div id="vote-{{ entry.pk }}">
           {% include "meta/partials/vote_buttons.html" with entry=entry user_vote=user_votes|default_if_none:"" %}
         </div>
@@ -70,7 +66,9 @@
   {% empty %}
   <div style="text-align:center;padding:80px 24px;color:var(--text-3);">
     <p style="font-size:18px;">Данных для этого патча пока нет.</p>
+    {% if user.is_staff %}
     <p style="font-size:14px;margin-top:8px;">Добавьте героев через <a href="/admin/meta/tierentry/add/" style="color:var(--accent);">админ-панель</a>.</p>
+    {% endif %}
   </div>
   {% endfor %}
 

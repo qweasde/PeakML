@@ -33,7 +33,10 @@
       "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://127.0.0.1:8000/guide/interfeys-i-upravlenie/\" -UseBasicParsing -TimeoutSec 5; if \\($r.Content -match \"Интерфейс|Мини-карта\"\\) { \"Guide detail: OK\" } else { \"Guide detail: 200 but no content\" } } catch { \"Error: $\\($_.Exception.Message\\)\" })",
       "PowerShell($r = Invoke-WebRequest -Uri \"http://127.0.0.1:8000/admin/\" -UseBasicParsing -TimeoutSec 5; $r.Content | Select-String -Pattern \"django/admin/css|staticfiles\" | Select-Object -First 5)",
       "PowerShell($r = Invoke-WebRequest -Uri \"http://127.0.0.1:8000/admin/\" -UseBasicParsing -TimeoutSec 5; if \\($r.Content -match '/static/admin/'\\) { \"Admin static refs found\" } else { \"NO admin static refs\" }; $r.Content | Select-String \"admin/css|admin/js\" | Select-Object -First 3)",
-      "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://127.0.0.1:8000/static/admin/js/nav_sidebar.js\" -UseBasicParsing -TimeoutSec 5; \"JS status: $\\($r.StatusCode\\), size: $\\($r.Content.Length\\) bytes\" } catch { \"JS load error: $\\($_.Exception.Message\\)\" })"
+      "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://127.0.0.1:8000/static/admin/js/nav_sidebar.js\" -UseBasicParsing -TimeoutSec 5; \"JS status: $\\($r.StatusCode\\), size: $\\($r.Content.Length\\) bytes\" } catch { \"JS load error: $\\($_.Exception.Message\\)\" })",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\Islam\\\\Desktop\\\\mlsite\" -Recurse -Directory)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(xargs cat *)"
     ]
   }
 }

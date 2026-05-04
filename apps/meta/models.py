@@ -24,6 +24,22 @@ class Role(models.Model):
 
 
 class Hero(models.Model):
+    DAMAGE_CHOICES = [
+        ("physical", "Физический"),
+        ("magic", "Магический"),
+        ("mixed", "Смешанный"),
+    ]
+    PHASE_CHOICES = [
+        ("early", "Ранняя игра"),
+        ("mid", "Средняя игра"),
+        ("late", "Поздняя игра"),
+    ]
+    MOBILITY_CHOICES = [
+        ("high", "Высокая"),
+        ("medium", "Средняя"),
+        ("low", "Низкая"),
+    ]
+
     name = models.CharField(max_length=100, unique=True)
     name_ru = models.CharField(max_length=100)
     slug = models.SlugField(max_length=120, unique=True)
@@ -36,6 +52,12 @@ class Hero(models.Model):
     is_free = models.BooleanField(default=False)
     image = models.ImageField(upload_to="heroes/", null=True, blank=True)
     icon = models.ImageField(upload_to="heroes/icons/", null=True, blank=True)
+
+    damage_type = models.CharField(max_length=10, choices=DAMAGE_CHOICES, blank=True, default="", verbose_name="Тип урона")
+    game_phase = models.CharField(max_length=10, choices=PHASE_CHOICES, blank=True, default="", verbose_name="Силён на стадии")
+    mobility = models.CharField(max_length=10, choices=MOBILITY_CHOICES, blank=True, default="", verbose_name="Мобильность")
+    has_cc = models.BooleanField(default=False, verbose_name="Есть контроль")
+    has_sustain = models.BooleanField(default=False, verbose_name="Есть восстановление")
 
     class Meta:
         verbose_name = "Герой"
@@ -96,11 +118,40 @@ class TierEntry(models.Model):
         return self.votes_up - self.votes_down
 
 
+class HeroCounter(models.Model):
+    STRENGTH_CHOICES = [("hard", "Жёсткий"), ("soft", "Мягкий")]
+    hero = models.ForeignKey(Hero, on_delete=models.CASCADE, related_name="countered_by_relations", verbose_name="Герой")
+    countered_by = models.ForeignKey(Hero, on_delete=models.CASCADE, related_name="counters_relations", verbose_name="Контрится героем")
+    strength = models.CharField(max_length=10, choices=STRENGTH_CHOICES, default="soft", verbose_name="Сила")
+
+    class Meta:
+        unique_together = ("hero", "countered_by")
+        verbose_name = "Контр-пик"
+        verbose_name_plural = "Контр-пики"
+
+    def __str__(self):
+        return f"{self.countered_by} → {self.hero} ({self.get_strength_display()})"
+
+
+class HeroSynergy(models.Model):
+    STRENGTH_CHOICES = [("strong", "Сильная"), ("moderate", "Умеренная")]
+    hero_a = models.ForeignKey(Hero, on_delete=models.CASCADE, related_name="synergies_a", verbose_name="Герой A")
+    hero_b = models.ForeignKey(Hero, on_delete=models.CASCADE, related_name="synergies_b", verbose_name="Герой B")
+    strength = models.CharField(max_length=10, choices=STRENGTH_CHOICES, default="moderate", verbose_name="Сила")
+
+    class Meta:
+        unique_together = ("hero_a", "hero_b")
+        verbose_name = "Синергия"
+        verbose_name_plural = "Синергии"
+
+    def __str__(self):
+        return f"{self.hero_a} + {self.hero_b} ({self.get_strength_display()})"
+
+
 class HeroVote(models.Model):
     """Голос пользователя за тир героя."""
-    from django.conf import settings
     user = models.ForeignKey(
-        "core.User", on_delete=models.CASCADE, related_name="hero_votes"
+        "profile.SiteUser", on_delete=models.CASCADE, related_name="hero_votes"
     )
     tier_entry = models.ForeignKey(TierEntry, on_delete=models.CASCADE, related_name="votes")
     is_upvote = models.BooleanField()

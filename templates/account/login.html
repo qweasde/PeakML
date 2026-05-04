@@ -1,26 +1,20 @@
 {% extends "base.html" %}
-{% load i18n %}
 
 {% block title %}Вход{% endblock %}
 
 {% block content %}
 <div style="min-height:calc(100dvh - 64px);display:flex;align-items:center;justify-content:center;padding:40px 16px;position:relative;overflow:hidden;">
-
-  <!-- bg grid -->
   <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(127,119,221,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(127,119,221,.04) 1px,transparent 1px);background-size:48px 48px;" aria-hidden="true"></div>
   <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(127,119,221,.07) 0%,transparent 65%);" aria-hidden="true"></div>
 
   <div class="auth-card" style="position:relative;z-index:2;width:100%;max-width:440px;padding:44px 40px;">
-
-    <!-- Logo -->
     <div style="text-align:center;margin-bottom:36px;">
       <a href="/" style="font-family:'Russo One',sans-serif;font-size:28px;color:var(--accent);text-decoration:none;letter-spacing:.04em;text-shadow:0 0 32px rgba(127,119,221,.55);">
         Peak<span style="color:var(--text-1)">ML</span>
       </a>
-      <p style="margin-top:10px;font-size:13px;color:var(--text-3);">Войди и доминируй в каждой игре</p>
+      <p style="margin-top:10px;font-size:13px;color:var(--text-3);">Войди и продолжай работу с сайтом</p>
     </div>
 
-    <!-- Errors (non-field) -->
     {% if form.non_field_errors %}
     <div style="background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:13px;color:#f87171;">
       {% for error in form.non_field_errors %}{{ error }}{% endfor %}
@@ -29,76 +23,36 @@
 
     <form method="POST" action="{% url 'account_login' %}" novalidate>
       {% csrf_token %}
-      {% if redirect_field_value %}
-        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+      {% if request.GET.next %}
+        <input type="hidden" name="next" value="{{ request.GET.next }}" />
       {% endif %}
 
-      <!-- Email -->
       <div class="form-group">
-        <label class="form-label" for="id_login">Email</label>
-        <input
-          class="form-input{% if form.login.errors %} error{% endif %}"
-          type="email"
-          name="login"
-          id="id_login"
-          value="{{ form.login.value|default:'' }}"
-          placeholder="you@example.com"
-          autocomplete="email"
-          autofocus
-        />
-        {% for error in form.login.errors %}
-          <p class="form-error">{{ error }}</p>
-        {% endfor %}
+        <label class="form-label" for="id_email">Email</label>
+        <input class="form-input{% if form.email.errors %} error{% endif %}" type="email" name="email" id="id_email" value="{{ form.email.value|default:'' }}" placeholder="you@example.com" autocomplete="email" autofocus />
+        {% for error in form.email.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
       </div>
 
-      <!-- Password -->
       <div class="form-group" x-data="{ show: false }">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;">
-          <label class="form-label" for="id_password">Пароль</label>
-          <a href="{% url 'account_reset_password' %}" style="font-size:11px;color:var(--accent);text-decoration:none;letter-spacing:.04em;" tabindex="-1">Забыл пароль?</a>
-        </div>
+        <label class="form-label" for="id_password">Пароль</label>
         <div style="position:relative;">
-          <input
-            class="form-input{% if form.password.errors %} error{% endif %}"
-            :type="show ? 'text' : 'password'"
-            name="password"
-            id="id_password"
-            placeholder="••••••••"
-            autocomplete="current-password"
-            style="padding-right:48px;"
-          />
-          <button type="button" @click="show=!show" tabindex="-1"
-            style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-3);padding:4px;"
-            :aria-label="show ? 'Скрыть пароль' : 'Показать пароль'">
-            <svg x-show="!show" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            <svg x-show="show" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          <input class="form-input{% if form.password.errors %} error{% endif %}" :type="show ? 'text' : 'password'" name="password" id="id_password" placeholder="••••••••" autocomplete="current-password" style="padding-right:48px;" />
+          <button type="button" @click="show=!show" tabindex="-1" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-3);padding:4px;">
+            <svg x-show="!show" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg x-show="show" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
           </button>
         </div>
-        {% for error in form.password.errors %}
-          <p class="form-error">{{ error }}</p>
-        {% endfor %}
+        {% for error in form.password.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
       </div>
 
-      <!-- Remember -->
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px;">
-        <input type="checkbox" name="remember" id="id_remember"
-          style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer;"
-          {% if form.remember.value %}checked{% endif %} />
-        <label for="id_remember" style="font-size:13px;color:var(--text-2);cursor:pointer;">Запомнить меня</label>
-      </div>
-
-      <button type="submit" class="btn-primary" style="width:100%;justify-content:center;height:50px;font-size:14px;">
-        Войти
-      </button>
+      <button type="submit" class="btn-primary" style="width:100%;justify-content:center;height:50px;font-size:14px;">Войти</button>
     </form>
 
     <div class="auth-divider">или</div>
-
     <p style="text-align:center;font-size:13px;color:var(--text-3);">
       Нет аккаунта?
       <a href="{% url 'account_signup' %}" style="color:var(--accent);text-decoration:none;font-weight:600;margin-left:4px;">Зарегистрироваться</a>
     </p>
-
   </div>
 </div>
 {% endblock %}

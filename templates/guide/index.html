@@ -43,7 +43,9 @@
   {% empty %}
   <div style="text-align:center;padding:80px 24px;color:var(--text-3);">
     <p style="font-size:18px;">Гайды пока не добавлены.</p>
+    {% if user.is_staff %}
     <p style="font-size:14px;margin-top:8px;">Добавьте через <a href="/admin/guide/" style="color:var(--accent);">админ-панель</a>.</p>
+    {% endif %}
   </div>
   {% endfor %}
 
