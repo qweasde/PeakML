@@ -1,18 +1,19 @@
 from django.contrib import admin
 
-from .models import Service, ServiceOrder
+from .models import Service, ServiceOrder, SubscriptionPlan
 
 
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
-    list_display = ("title", "price_display", "is_active", "sort_order", "updated_at")
-    list_editable = ("is_active", "sort_order")
-    list_filter = ("is_active",)
+    list_display = ("title", "price_display", "is_pro", "is_active", "sort_order", "updated_at")
+    list_editable = ("is_pro", "is_active", "sort_order")
+    list_filter = ("is_pro", "is_active")
     search_fields = ("title", "description", "price", "price_note")
     readonly_fields = ("created_at", "updated_at")
     fieldsets = (
-        (None, {"fields": ("title", "description", "icon")}),
-        ("Цена", {"fields": ("price", "price_note")}),
+        (None, {"fields": ("title", "description", "icon")} ),
+        ("Цена", {"fields": ("price", "price_note")} ),
+        ("Подписка PRO", {"fields": ("is_pro",)}),
         ("Публикация", {"fields": ("is_active", "sort_order")}),
         ("Служебное", {"fields": ("created_at", "updated_at")}),
     )
@@ -28,5 +29,21 @@ class ServiceOrderAdmin(admin.ModelAdmin):
     fieldsets = (
         ("Заявка", {"fields": ("service", "status", "comment")}),
         ("Клиент", {"fields": ("site_user", "full_name", "email", "phone")}),
+        ("Служебное", {"fields": ("created_at", "updated_at")}),
+    )
+
+
+@admin.register(SubscriptionPlan)
+class SubscriptionPlanAdmin(admin.ModelAdmin):
+    list_display = ("title", "price", "is_featured", "is_active", "sort_order", "updated_at")
+    list_editable = ("is_featured", "is_active", "sort_order")
+    list_filter = ("is_featured", "is_active")
+    search_fields = ("title", "description")
+    readonly_fields = ("created_at", "updated_at")
+    fieldsets = (
+        (None, {"fields": ("title", "description")}),
+        ("Цена", {"fields": ("price",)}),
+        ("Дизайн", {"fields": ("is_featured",)}),
+        ("Публикация", {"fields": ("is_active", "sort_order")}),
         ("Служебное", {"fields": ("created_at", "updated_at")}),
     )

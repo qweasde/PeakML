@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Корзина услуг{% endblock %}
+{% block meta_desc %}Список услуг, выбранных для покупки.{% endblock %}
+
+{% block content %}
+<section style="position:relative;overflow:hidden;padding:36px 24px 56px;">
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(127,119,221,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(127,119,221,.04) 1px,transparent 1px);background-size:48px 48px;" aria-hidden="true"></div>
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 55% at 50% 0%,rgba(127,119,221,.08),transparent 68%);" aria-hidden="true"></div>
+
+  <div style="position:relative;z-index:2;max-width:1040px;margin:0 auto;">
+    <div style="max-width:640px;margin-bottom:26px;">
+      <span class="section-eyebrow">Корзина</span>
+      <h1 style="font-family:'Russo One',sans-serif;font-size:clamp(28px,4vw,42px);line-height:1.08;margin-top:8px;">Ваши выбранные услуги</h1>
+      <p style="color:var(--text-2);font-size:14px;line-height:1.65;margin-top:10px;">Здесь можно проверить выбранные услуги и оформить заказ.</p>
+    </div>
+
+    {% if cart_items %}
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:18px;">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        {% for item in cart_items %}
+        <article class="card" style="padding:18px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start;">
+          <div>
+            <h2 style="font-family:'Russo One',sans-serif;font-size:18px;line-height:1.25;margin-bottom:6px;">{{ item.title }}</h2>
+            <p style="color:var(--text-2);font-size:13px;line-height:1.6;margin-bottom:10px;">{{ item.description|truncatewords:24 }}</p>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <span style="font-family:'Russo One',sans-serif;font-size:14px;color:var(--accent);">{{ item.price_display }}</span>
+            </div>
+          </div>
+          <form method="POST" action="{% url 'services:cart_remove' item.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn-outline" style="height:40px;">Удалить</button>
+          </form>
+        </article>
+        {% endfor %}
+      </div>
+
+      <aside class="card" style="padding:24px;display:flex;flex-direction:column;gap:18px;">
+        <div>
+          <div style="font-size:13px;color:var(--text-3);margin-bottom:6px;">Итого услуг</div>
+          <div style="font-family:'Russo One',sans-serif;font-size:26px;color:var(--accent);">{{ cart_items|length }}</div>
+        </div>
+        <div>
+          <div style="font-size:13px;color:var(--text-3);margin-bottom:6px;">Общая сумма</div>
+          <div style="font-family:'Russo One',sans-serif;font-size:26px;color:var(--accent);">{{ cart_total }} ₽</div>
+        </div>
+        <div style="font-size:13px;color:var(--text-3);line-height:1.6;">Оплата пока не подключена. После оформления заказа менеджер свяжется с вами для подтверждения и оплаты.</div>
+        <form method="POST" action="{% url 'services:checkout' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn-primary" style="width:100%;height:46px;font-size:14px;">Оформить и оплатить</button>
+        </form>
+        <a href="{% url 'services:index' %}" class="btn-outline" style="display:inline-flex;justify-content:center;height:42px;font-size:13px;">Продолжить выбор услуг</a>
+      </aside>
+    </div>
+    {% else %}
+    <div class="card" style="padding:32px;text-align:center;color:var(--text-3);">
+      <p style="font-size:16px;margin-bottom:14px;">Ваша корзина пуста.</p>
+      <a href="{% url 'services:index' %}" class="btn-primary" style="font-size:13px;">Перейти к услугам</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

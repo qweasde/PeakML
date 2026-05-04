@@ -1,3 +1,6 @@
+import re
+from decimal import Decimal, InvalidOperation
+
 from django.db import models
 
 
@@ -12,6 +15,7 @@ class Service(models.Model):
         help_text="Необязательный текст после слеша, например: час, игра, месяц.",
     )
     icon = models.ImageField(upload_to="services/icons/", null=True, blank=True, verbose_name="Иконка")
+    is_pro = models.BooleanField(default=False, verbose_name="Только PRO", help_text="Пометить услугу как доступную по подписке PRO.")
     is_active = models.BooleanField(default=True, verbose_name="Показывать на сайте")
     sort_order = models.PositiveIntegerField(default=100, verbose_name="Порядок")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -30,6 +34,21 @@ class Service(models.Model):
         if self.price_note:
             return f"{self.price} ₽ / {self.price_note}"
         return f"{self.price} ₽"
+
+    @property
+    def price_amount(self):
+        if not self.price:
+            return Decimal(0)
+
+        cleaned = re.sub(r"[^\d.,]", "", self.price).strip().replace(",", ".")
+        if not cleaned:
+            return Decimal(0)
+
+        try:
+            return Decimal(cleaned)
+        except InvalidOperation:
+            digits = re.sub(r"\D", "", self.price)
+            return Decimal(digits or 0)
 
 
 class ServiceOrder(models.Model):
@@ -63,3 +82,23 @@ class ServiceOrder(models.Model):
 
     def __str__(self):
         return f"{self.service} — {self.full_name}"
+
+
+class SubscriptionPlan(models.Model):
+    """План подписки PRO."""
+    title = models.CharField(max_length=160, verbose_name="Название")
+    description = models.TextField(verbose_name="Что входит", help_text="Список преимуществ, по одному на строку")
+    price = models.CharField(max_length=80, verbose_name="Цена")
+    is_featured = models.BooleanField(default=False, verbose_name="Выделенный план", help_text="Центральный блок со ярким дизайном")
+    is_active = models.BooleanField(default=True, verbose_name="Показывать на сайте")
+    sort_order = models.PositiveIntegerField(default=100, verbose_name="Порядок")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "План подписки"
+        verbose_name_plural = "Планы подписки"
+        ordering = ["sort_order", "title"]
+
+    def __str__(self):
+        return self.title

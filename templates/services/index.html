@@ -13,6 +13,11 @@
       <span class="section-eyebrow">Сервисы</span>
       <h1 style="font-family:'Russo One',sans-serif;font-size:clamp(28px,4vw,42px);line-height:1.08;margin-top:8px;">Услуги</h1>
       <p style="color:var(--text-2);font-size:14px;line-height:1.65;margin-top:10px;">Выбирай формат поддержки под свою задачу: разбор, подготовка, сопровождение или точечная помощь.</p>
+      {% if request.session.service_cart %}
+      <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;">
+        <a href="{% url 'services:cart' %}" class="btn-outline" style="font-size:13px;">Перейти в корзину</a>
+      </div>
+      {% endif %}
     </div>
 
     {% if services %}
@@ -35,9 +40,13 @@
           <p style="color:var(--text-2);font-size:13px;line-height:1.6;">{{ service.description }}</p>
         </div>
 
-        <form method="POST" action="{% url 'services:order' service.pk %}">
+        <form method="POST" action="{% url 'services:cart_add' service.pk %}">
           {% csrf_token %}
-          <button type="submit" class="btn-primary" style="width:100%;justify-content:center;height:42px;font-size:13px;">Заказать</button>
+          {% if cart_service_ids and service.pk in cart_service_ids %}
+            <button type="submit" class="btn-primary" style="width:100%;justify-content:center;height:42px;font-size:13px;background:#eff6ff;color:#1d4ed8;border:1px solid #93c5fd;" disabled>Добавлено<span style="margin-left:8px;font-size:14px;line-height:1;">✓</span></button>
+          {% else %}
+            <button type="submit" class="btn-primary" style="width:100%;justify-content:center;height:42px;font-size:13px;">В корзину</button>
+          {% endif %}
         </form>
       </article>
       {% endfor %}
