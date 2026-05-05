@@ -62,6 +62,33 @@ class Guide(models.Model):
         return markdown.markdown(self.content, extensions=["fenced_code", "tables", "nl2br"])
 
 
+class Build(models.Model):
+    hero         = models.ForeignKey("meta.Hero", on_delete=models.CASCADE, related_name="builds", verbose_name="Герой")
+    role         = models.ForeignKey("meta.Role", on_delete=models.SET_NULL, null=True, blank=True, related_name="builds", verbose_name="Роль")
+    title        = models.CharField(max_length=200, verbose_name="Название")
+    slug         = models.SlugField(max_length=220, unique=True, blank=True, verbose_name="Slug")
+    description  = models.TextField(blank=True, verbose_name="Описание")
+    items        = models.ManyToManyField("meta.Item", blank=True, verbose_name="Предметы", related_name="builds")
+    patch        = models.ForeignKey("meta.Patch", on_delete=models.SET_NULL, null=True, blank=True, related_name="builds", verbose_name="Патч")
+    is_published = models.BooleanField(default=False, verbose_name="Опубликован")
+    order        = models.PositiveSmallIntegerField(default=0, verbose_name="Порядок")
+    created_at   = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Сборка"
+        verbose_name_plural = "Сборки"
+        ordering = ["order", "-created_at"]
+
+    def __str__(self):
+        return f"{self.hero} — {self.title}"
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base = slugify(f"{self.hero}-{self.title}") if self.hero_id else slugify(self.title)
+            self.slug = base
+        super().save(*args, **kwargs)
+
+
 class GlossaryTerm(models.Model):
     term = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(unique=True, max_length=120)

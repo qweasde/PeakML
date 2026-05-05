@@ -16,7 +16,20 @@
     </a>
 
     <ul style="display:flex;align-items:center;gap:28px;list-style:none;" class="hidden md:flex">
-      <li><a href="{% url 'meta:index' %}" class="nav-link {% if request.resolver_match.namespace == 'meta' %}active{% endif %}">Мета</a></li>
+      <li style="position:relative;" x-data="{ metaOpen: false }" @mouseenter="metaOpen=true" @mouseleave="metaOpen=false">
+        <button class="nav-link {% if request.resolver_match.namespace == 'meta' or request.resolver_match.namespace == 'builds' %}active{% endif %}"
+          style="background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:4px;"
+          @click="metaOpen=!metaOpen" :aria-expanded="metaOpen.toString()">
+          Мета
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="transition:transform 200ms;" :style="metaOpen ? 'transform:rotate(180deg)' : ''" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div x-show="metaOpen" x-transition.opacity
+          style="position:absolute;top:calc(100% + 10px);left:0;min-width:150px;background:var(--bg-deep);border:1px solid var(--border-hover);border-radius:12px;padding:6px;z-index:300;box-shadow:0 12px 32px rgba(0,0,0,.45);">
+          <a href="{% url 'meta:index' %}" class="dd-item {% if request.resolver_match.namespace == 'meta' and request.resolver_match.url_name == 'index' %}dd-item--active{% endif %}">Тирлист</a>
+          <a href="{% url 'builds:index' %}" class="dd-item {% if request.resolver_match.namespace == 'builds' %}dd-item--active{% endif %}">Билды</a>
+          <a href="{% url 'meta:items' %}" class="dd-item {% if request.resolver_match.url_name == 'items' %}dd-item--active{% endif %}">Предметы</a>
+        </div>
+      </li>
       <li><a href="{% url 'services:index' %}" class="nav-link {% if request.resolver_match.namespace == 'services' and request.resolver_match.url_name != 'pro' %}active{% endif %}">Услуги</a></li>
       <li><a href="{% url 'services:pro' %}" style="border:1px solid #a855f7;background:rgba(168,85,247,.14);color:#c084fc;font-weight:700;border-radius:999px;padding:10px 16px;text-decoration:none;">PRO</a></li>
       <li><a href="{% url 'draft:index' %}" class="nav-link {% if request.resolver_match.namespace == 'draft' %}active{% endif %}">Драфт</a></li>
@@ -57,7 +70,9 @@
 
   <div x-show="open" x-transition style="background:var(--bg-deep);border-top:1px solid var(--border);padding:20px 24px 24px;" class="md:hidden">
     <ul style="list-style:none;display:flex;flex-direction:column;gap:4px;margin-bottom:20px;">
-      <li><a href="{% url 'meta:index' %}" @click="open=false" style="display:block;color:var(--text-2);text-decoration:none;font-size:15px;font-weight:500;padding:12px 0;border-bottom:1px solid var(--border);">Мета</a></li>
+      <li><a href="{% url 'meta:index' %}" @click="open=false" style="display:block;color:var(--text-2);text-decoration:none;font-size:15px;font-weight:500;padding:12px 0;border-bottom:1px solid var(--border);">Тирлист</a></li>
+      <li><a href="{% url 'builds:index' %}" @click="open=false" style="display:block;color:var(--text-2);text-decoration:none;font-size:15px;font-weight:500;padding:12px 0;border-bottom:1px solid var(--border);">Билды</a></li>
+      <li><a href="{% url 'meta:items' %}" @click="open=false" style="display:block;color:var(--text-2);text-decoration:none;font-size:15px;font-weight:500;padding:12px 0;border-bottom:1px solid var(--border);">Предметы</a></li>
       <li><a href="{% url 'services:index' %}" @click="open=false" style="display:block;color:var(--text-2);text-decoration:none;font-size:15px;font-weight:500;padding:12px 0;border-bottom:1px solid var(--border);">Услуги</a></li>
       <li><a href="{% url 'services:pro' %}" @click="open=false" style="display:block;color:#c084fc;background:rgba(168,85,247,.14);border:1px solid #a855f7;border-radius:12px;padding:12px 14px;text-decoration:none;font-size:15px;font-weight:700;">PRO</a></li>
       <li><a href="{% url 'draft:index' %}" @click="open=false" style="display:block;color:var(--text-2);text-decoration:none;font-size:15px;font-weight:500;padding:12px 0;border-bottom:1px solid var(--border);">Драфт</a></li>

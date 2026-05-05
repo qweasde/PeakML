@@ -1,0 +1,56 @@
+<section style="padding:88px 0;background:var(--bg-deep);position:relative;">
+  <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--border-hover),transparent);" aria-hidden="true"></div>
+  <div style="max-width:1160px;margin:0 auto;padding:0 24px;">
+
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:40px;">
+      <div>
+        {% if section.badge %}<span class="section-eyebrow">{{ section.badge }}</span>{% else %}<span class="section-eyebrow">Билды</span>{% endif %}
+        <h2 style="font-family:'Russo One',sans-serif;font-size:clamp(24px,3.5vw,36px);">{{ section.title|default:"Лучшие сборки" }}</h2>
+        {% if section.subtitle %}<p style="color:var(--text-2);margin-top:8px;font-size:15px;line-height:1.7;">{{ section.subtitle }}</p>{% endif %}
+      </div>
+    </div>
+
+    {% if top_builds %}
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;">
+      {% for build in top_builds %}
+      <div class="card" style="padding:24px;">
+
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+          <div style="width:48px;height:48px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--border-hover);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;">
+            {% if build.hero.icon %}
+              <img src="{{ build.hero.icon.url }}" alt="{{ build.hero }}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">
+            {% else %}
+              <span style="font-family:'Russo One',sans-serif;font-size:16px;color:var(--accent);">{{ build.hero.name_ru|slice:":2" }}</span>
+            {% endif %}
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px;">{{ build.hero.role }}</div>
+            <div style="font-family:'Russo One',sans-serif;font-size:15px;color:var(--text-1);">{{ build.hero.name_ru }}</div>
+          </div>
+          {% if build.patch %}
+          <span style="margin-left:auto;font-size:10px;font-weight:600;letter-spacing:.08em;padding:3px 8px;border-radius:100px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--border-hover);">
+            {{ build.patch.version }}
+          </span>
+          {% endif %}
+        </div>
+
+        <div style="font-family:'Russo One',sans-serif;font-size:15px;margin-bottom:8px;">{{ build.title }}</div>
+
+        {% if build.description %}
+        <p style="font-size:13px;color:var(--text-2);line-height:1.6;margin:0;">{{ build.description|truncatechars:110 }}</p>
+        {% endif %}
+
+      </div>
+      {% endfor %}
+    </div>
+
+    {% else %}
+    <div style="text-align:center;padding:64px 24px;border:1px dashed var(--border);border-radius:var(--radius);">
+      <div style="font-size:32px;margin-bottom:12px;opacity:.4;">⚔️</div>
+      <div style="font-family:'Russo One',sans-serif;font-size:16px;margin-bottom:8px;">Сборки скоро появятся</div>
+      <p style="font-size:14px;color:var(--text-3);margin:0;">Актуальные билды для текущего патча уже готовятся</p>
+    </div>
+    {% endif %}
+
+  </div>
+</section>

@@ -103,6 +103,9 @@ class TierEntry(models.Model):
     votes_up = models.PositiveIntegerField(default=0)
     votes_down = models.PositiveIntegerField(default=0)
     notes = models.TextField(blank=True)
+    win_rate  = models.FloatField(null=True, blank=True, verbose_name="Винрейт (%)")
+    pick_rate = models.FloatField(null=True, blank=True, verbose_name="Пик-рейт (%)")
+    ban_rate  = models.FloatField(null=True, blank=True, verbose_name="Бан-рейт (%)")
 
     class Meta:
         verbose_name = "Запись тирлиста"
@@ -146,6 +149,42 @@ class HeroSynergy(models.Model):
 
     def __str__(self):
         return f"{self.hero_a} + {self.hero_b} ({self.get_strength_display()})"
+
+
+class Item(models.Model):
+    CATEGORY_CHOICES = [
+        ("attack",   "Атака"),
+        ("defense",  "Защита"),
+        ("magic",    "Магия"),
+        ("movement", "Передвижение"),
+        ("jungle",   "Джунгли"),
+        ("roaming",  "Поддержка"),
+    ]
+
+    name        = models.CharField(max_length=100, unique=True, verbose_name="Название (EN)")
+    name_ru     = models.CharField(max_length=100, verbose_name="Название")
+    slug        = models.SlugField(max_length=120, unique=True)
+    category    = models.CharField(max_length=20, choices=CATEGORY_CHOICES, verbose_name="Категория")
+    description = models.TextField(blank=True, verbose_name="Описание")
+    icon        = models.ImageField(upload_to="items/", null=True, blank=True, verbose_name="Иконка")
+    price       = models.PositiveIntegerField(default=0, verbose_name="Цена (золото)")
+    patch       = models.ForeignKey(
+        Patch, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="items", verbose_name="Добавлен в патче"
+    )
+
+    class Meta:
+        verbose_name = "Предмет"
+        verbose_name_plural = "Предметы"
+        ordering = ["category", "name_ru"]
+
+    def __str__(self):
+        return self.name_ru or self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
 
 class HeroVote(models.Model):

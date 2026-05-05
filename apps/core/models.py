@@ -86,6 +86,35 @@ class User(AbstractUser):
         return self.email
 
 
+class HomeSection(models.Model):
+    SLUG_CHOICES = [
+        ("features",     "Что внутри"),
+        ("guides",       "Последние гайды"),
+        ("builds",       "Лучшие сборки"),
+        ("how_it_works", "Как это работает"),
+        ("cta",          "Призыв к действию"),
+    ]
+
+    slug       = models.CharField(max_length=50, choices=SLUG_CHOICES, unique=True, verbose_name="Блок")
+    is_enabled = models.BooleanField(default=True, verbose_name="Показывать")
+    order      = models.PositiveSmallIntegerField(default=0, verbose_name="Порядок")
+    badge      = models.CharField(max_length=80, blank=True, verbose_name="Бейдж", help_text="Маленький тег над заголовком, необязательно")
+    title      = models.CharField(max_length=200, blank=True, verbose_name="Заголовок", help_text="Оставьте пустым для использования заголовка по умолчанию")
+    subtitle   = models.CharField(max_length=400, blank=True, verbose_name="Подзаголовок", help_text="Необязательно")
+
+    class Meta:
+        verbose_name = "Блок главной страницы"
+        verbose_name_plural = "Блоки главной страницы"
+        ordering = ["order"]
+
+    def __str__(self):
+        return self.get_slug_display()
+
+    @property
+    def template_name(self):
+        return f"home/sections/{self.slug}.html"
+
+
 def _validate_ico(value):
     if not value.name.lower().endswith(".ico"):
         raise ValidationError("Допустимы только файлы с расширением .ico")

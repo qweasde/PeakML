@@ -36,7 +36,24 @@
       "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://127.0.0.1:8000/static/admin/js/nav_sidebar.js\" -UseBasicParsing -TimeoutSec 5; \"JS status: $\\($r.StatusCode\\), size: $\\($r.Content.Length\\) bytes\" } catch { \"JS load error: $\\($_.Exception.Message\\)\" })",
       "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\Islam\\\\Desktop\\\\mlsite\" -Recurse -Directory)",
       "Bash(Select-Object -ExpandProperty FullName)",
-      "Bash(xargs cat *)"
+      "Bash(xargs cat *)",
+      "Bash(xargs grep *)",
+      "Bash(.venv/Scripts/python.exe manage.py makemigrations core guide)",
+      "Bash(.venv/Scripts/python.exe manage.py migrate)",
+      "Bash(.venv/Scripts/python.exe manage.py shell -c ' *)",
+      "Bash(.venv/Scripts/python.exe manage.py check)",
+      "Bash(python manage.py makemigrations core --name=\"homesection_text_fields\")",
+      "Bash(python manage.py migrate)",
+      "Bash(python -c \"import django; django.setup\\(\\); from django.conf import settings; print\\('\\\\n'.join\\(settings.INSTALLED_APPS\\)\\)\")",
+      "Bash(python manage.py shell -c \"from django.conf import settings; print\\('\\\\n'.join\\(settings.INSTALLED_APPS\\)\\)\")",
+      "Bash(python manage.py shell -c \"from django.urls import get_resolver; [print\\(p\\) for p in get_resolver\\(\\).url_patterns]\")",
+      "Bash(python manage.py shell -c \"from django.conf import settings; print\\(settings.ROOT_URLCONF\\)\")",
+      "Bash(python manage.py makemigrations meta --name=\"add_item\")",
+      "Bash(python manage.py makemigrations guide --name=\"build_slug_items_role\")",
+      "WebFetch(domain:www.mobilelegends.com)",
+      "Bash(pip install *)",
+      "Bash(python -c \"import playwright; print\\('playwright ok'\\)\")",
+      "Bash(playwright install *)"
     ]
   }
 }

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Предметы — PeakML{% endblock %}
+
+{% block content %}
+<section style="padding:88px 0 64px;">
+  <div style="max-width:1160px;margin:0 auto;padding:0 24px;">
+
+    <div style="margin-bottom:48px;">
+      <span class="section-eyebrow">База знаний</span>
+      <h1 style="font-family:'Russo One',sans-serif;font-size:clamp(28px,4vw,44px);margin-bottom:12px;">Предметы</h1>
+      <p style="font-size:15px;color:var(--text-2);max-width:520px;line-height:1.7;">Полный список предметов Mobile Legends с описаниями и характеристиками.</p>
+    </div>
+
+    <!-- Фильтр по категории -->
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:36px;">
+      <a href="{% url 'meta:items' %}"
+        style="padding:7px 16px;border-radius:100px;font-size:13px;font-weight:500;text-decoration:none;border:1px solid {% if not category_filter %}var(--accent){% else %}var(--border){% endif %};background:{% if not category_filter %}var(--accent-dim){% else %}transparent{% endif %};color:{% if not category_filter %}var(--accent){% else %}var(--text-3){% endif %};">
+        Все
+      </a>
+      {% for slug, label in categories %}
+      <a href="?category={{ slug }}"
+        style="padding:7px 16px;border-radius:100px;font-size:13px;font-weight:500;text-decoration:none;border:1px solid {% if category_filter == slug %}var(--accent){% else %}var(--border){% endif %};background:{% if category_filter == slug %}var(--accent-dim){% else %}transparent{% endif %};color:{% if category_filter == slug %}var(--accent){% else %}var(--text-3){% endif %};">
+        {{ label }}
+      </a>
+      {% endfor %}
+    </div>
+
+    {% if items %}
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;">
+      {% for item in items %}
+      <div class="card scroll-reveal" data-delay="{{ forloop.counter0|divisibleby:4 }}00ms" style="padding:18px;display:flex;flex-direction:column;gap:12px;">
+
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:48px;height:48px;border-radius:10px;background:var(--accent-dim);border:1px solid var(--border-hover);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;">
+            {% if item.icon %}
+              <img src="{{ item.icon.url }}" alt="{{ item.name_ru }}" style="width:40px;height:40px;object-fit:cover;">
+            {% else %}
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.6;"><rect x="2" y="3" width="7" height="7"/><rect x="15" y="3" width="7" height="7"/><rect x="15" y="14" width="7" height="7"/><rect x="2" y="14" width="7" height="7"/></svg>
+            {% endif %}
+          </div>
+          <div style="min-width:0;">
+            <div style="font-family:'Russo One',sans-serif;font-size:14px;color:var(--text-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ item.name_ru }}</div>
+            <div style="font-size:11px;color:var(--text-3);margin-top:2px;">{{ item.get_category_display }}</div>
+          </div>
+        </div>
+
+        {% if item.description %}
+        <p style="font-size:12px;color:var(--text-2);line-height:1.6;margin:0;flex:1;">{{ item.description|truncatechars:80 }}</p>
+        {% endif %}
+
+        {% if item.price %}
+        <div style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-3);margin-top:auto;padding-top:8px;border-top:1px solid var(--border);">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <span style="color:var(--accent);font-weight:600;">{{ item.price }}</span>
+          <span>золота</span>
+        </div>
+        {% endif %}
+
+      </div>
+      {% endfor %}
+    </div>
+
+    {% else %}
+    <div style="text-align:center;padding:80px 24px;border:1px dashed var(--border);border-radius:var(--radius);">
+      <div style="font-size:36px;margin-bottom:12px;opacity:.4;">🛡️</div>
+      <div style="font-family:'Russo One',sans-serif;font-size:18px;margin-bottom:8px;">Предметы скоро появятся</div>
+      <p style="font-size:14px;color:var(--text-3);margin:0;">База предметов уже заполняется</p>
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}

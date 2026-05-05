@@ -1,0 +1,60 @@
+<section style="padding:88px 0;background:var(--bg);position:relative;">
+  <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--border-hover),transparent);" aria-hidden="true"></div>
+  <div style="max-width:1160px;margin:0 auto;padding:0 24px;">
+
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:40px;">
+      <div>
+        {% if section.badge %}<span class="section-eyebrow">{{ section.badge }}</span>{% else %}<span class="section-eyebrow">Обучение</span>{% endif %}
+        <h2 style="font-family:'Russo One',sans-serif;font-size:clamp(24px,3.5vw,36px);">{{ section.title|default:"Последние гайды" }}</h2>
+        {% if section.subtitle %}<p style="color:var(--text-2);margin-top:8px;font-size:15px;line-height:1.7;">{{ section.subtitle }}</p>{% endif %}
+      </div>
+      <a href="{% url 'guide:index' %}" class="btn-outline" style="font-size:13px;">Все гайды →</a>
+    </div>
+
+    {% if latest_guides %}
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;">
+      {% for guide in latest_guides %}
+      <a href="{% url 'guide:detail' guide.slug %}" class="card scroll-reveal" data-delay="{{ forloop.counter0 }}00ms" style="text-decoration:none;display:flex;flex-direction:column;overflow:hidden;">
+
+        {% if guide.cover %}
+        <div style="height:160px;overflow:hidden;">
+          <img src="{{ guide.cover.url }}" alt="{{ guide.title }}" style="width:100%;height:100%;object-fit:cover;transition:transform .4s ease;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+        </div>
+        {% else %}
+        <div style="height:160px;background:linear-gradient(135deg,var(--surface-2),var(--accent-dim));display:flex;align-items:center;justify-content:center;">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:.5;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        </div>
+        {% endif %}
+
+        <div style="padding:20px 20px 24px;flex:1;display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:3px 10px;border-radius:100px;background:var(--accent-dim);color:var(--accent);">
+              {{ guide.get_difficulty_display }}
+            </span>
+            {% if guide.series %}
+            <span style="font-size:11px;color:var(--text-3);">{{ guide.series.title }}</span>
+            {% endif %}
+          </div>
+          <div style="font-family:'Russo One',sans-serif;font-size:16px;color:var(--text-1);line-height:1.35;">{{ guide.title }}</div>
+          {% if guide.excerpt %}
+          <p style="font-size:13px;color:var(--text-2);line-height:1.6;margin:0;flex:1;">{{ guide.excerpt|truncatechars:100 }}</p>
+          {% endif %}
+          <div style="font-size:12px;color:var(--text-3);margin-top:auto;padding-top:8px;border-top:1px solid var(--border);">
+            {{ guide.created_at|date:"d M Y" }} &nbsp;·&nbsp; {{ guide.views }} просмотров
+          </div>
+        </div>
+
+      </a>
+      {% endfor %}
+    </div>
+
+    {% else %}
+    <div style="text-align:center;padding:64px 24px;border:1px dashed var(--border);border-radius:var(--radius);">
+      <div style="font-size:32px;margin-bottom:12px;opacity:.4;">📖</div>
+      <div style="font-family:'Russo One',sans-serif;font-size:16px;margin-bottom:8px;">Гайды скоро появятся</div>
+      <p style="font-size:14px;color:var(--text-3);margin:0;">Мы уже работаем над контентом</p>
+    </div>
+    {% endif %}
+
+  </div>
+</section>

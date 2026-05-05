@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 from .admin_forms import ADMIN_USERNAME, AdminOnlyAuthenticationForm
-from .models import SiteConfig, User
+from .models import SiteConfig, User, HomeSection
 
 
 def admin_only_has_permission(request):
@@ -67,3 +67,20 @@ class SiteConfigAdmin(admin.ModelAdmin):
         obj = SiteConfig.get()
         url = reverse("admin:core_siteconfig_change", args=[obj.pk])
         return HttpResponseRedirect(url)
+
+
+@admin.register(HomeSection)
+class HomeSectionAdmin(admin.ModelAdmin):
+    list_display  = ("get_slug_display", "is_enabled", "order")
+    list_editable = ("is_enabled", "order")
+    ordering      = ("order",)
+    fieldsets = (
+        (None, {"fields": ("slug", "is_enabled", "order")}),
+        ("Текст секции", {"fields": ("badge", "title", "subtitle"), "description": "Оставьте поля пустыми для использования текста по умолчанию"}),
+    )
+
+    def has_add_permission(self, request):
+        return HomeSection.objects.count() < len(HomeSection.SLUG_CHOICES)
+
+    def has_delete_permission(self, request, obj=None):
+        return False

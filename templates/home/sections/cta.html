@@ -1,0 +1,38 @@
+<section style="padding:96px 0;background:var(--bg-deep);position:relative;overflow:hidden;">
+  <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--border-hover),transparent);" aria-hidden="true"></div>
+
+  <!-- Фоновый глоу -->
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 50% 50%,rgba(127,119,221,.07) 0%,transparent 70%);" aria-hidden="true"></div>
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(127,119,221,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(127,119,221,.025) 1px,transparent 1px);background-size:48px 48px;" aria-hidden="true"></div>
+
+  <div style="position:relative;z-index:2;max-width:720px;margin:0 auto;padding:0 24px;text-align:center;">
+
+    <div style="display:inline-flex;align-items:center;gap:8px;background:var(--accent-dim);border:1px solid var(--border-hover);border-radius:100px;padding:6px 16px;font-size:11px;font-weight:600;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;margin-bottom:28px;">
+      {{ section.badge|default:"Бесплатно навсегда" }}
+    </div>
+
+    <h2 style="font-family:'Russo One',sans-serif;font-size:clamp(28px,5vw,52px);line-height:1.08;margin-bottom:20px;">
+      {% if section.title %}
+        {{ section.title }}
+      {% else %}
+        Готов начать<br>
+        <span style="color:var(--accent);text-shadow:0 0 40px rgba(127,119,221,.35);">доминировать?</span>
+      {% endif %}
+    </h2>
+
+    <p style="font-size:clamp(14px,1.8vw,17px);color:var(--text-2);line-height:1.75;max-width:520px;margin:0 auto 40px;">
+      {{ section.subtitle|default:"Регистрируйся бесплатно и получи доступ к тирлистам, гайдам и инструментам драфта прямо сейчас." }}
+    </p>
+
+    <div style="display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;">
+      <a href="{% url 'account_signup' %}" class="btn-primary" style="font-size:15px;padding:15px 32px;">
+        Начать бесплатно
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+      </a>
+      <a href="{% url 'meta:index' %}" style="display:inline-flex;align-items:center;gap:8px;color:var(--text-2);text-decoration:none;padding:15px 20px;font-size:14px;transition:color 150ms;" onmouseover="this.style.color='var(--text-1)'" onmouseout="this.style.color='var(--text-2)'">
+        Смотреть мета-тирлист →
+      </a>
+    </div>
+
+  </div>
+</section>

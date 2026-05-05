@@ -1,0 +1,63 @@
+<section style="padding:88px 0;background:var(--bg-deep);position:relative;">
+  <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--border-hover),transparent);" aria-hidden="true"></div>
+  <div style="max-width:1160px;margin:0 auto;padding:0 24px;">
+
+    <div style="text-align:center;margin-bottom:56px;">
+      {% if section.badge %}<span class="section-eyebrow">{{ section.badge }}</span>{% else %}<span class="section-eyebrow">Платформа</span>{% endif %}
+      <h2 style="font-family:'Russo One',sans-serif;font-size:clamp(24px,3.5vw,36px);">{{ section.title|default:"Всё что нужно — в одном месте" }}</h2>
+      {% if section.subtitle or not section.title %}
+      <p style="color:var(--text-2);margin-top:12px;max-width:480px;margin-left:auto;margin-right:auto;font-size:15px;line-height:1.7;">
+        {{ section.subtitle|default:"Инструменты для победы: от анализа меты до пошаговых гайдов и готовых сборок." }}
+      </p>
+      {% endif %}
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px;">
+
+      <!-- Тирлист -->
+      <div class="card scroll-reveal" data-delay="0ms" style="padding:28px 24px;">
+        <div style="width:44px;height:44px;border-radius:10px;background:var(--accent-dim);border:1px solid var(--border-hover);display:flex;align-items:center;justify-content:center;margin-bottom:18px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <div style="font-family:'Russo One',sans-serif;font-size:16px;margin-bottom:8px;">Мета-тирлист</div>
+        <p style="font-size:13px;color:var(--text-2);line-height:1.65;margin:0;">
+          Актуальный рейтинг героев по текущему патчу. Голосуй и смотри, кто сейчас доминирует.
+        </p>
+      </div>
+
+      <!-- Гайды -->
+      <div class="card scroll-reveal" data-delay="100ms" style="padding:28px 24px;">
+        <div style="width:44px;height:44px;border-radius:10px;background:var(--accent-dim);border:1px solid var(--border-hover);display:flex;align-items:center;justify-content:center;margin-bottom:18px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        </div>
+        <div style="font-family:'Russo One',sans-serif;font-size:16px;margin-bottom:8px;">Гайды</div>
+        <p style="font-size:13px;color:var(--text-2);line-height:1.65;margin:0;">
+          Детальные гайды по каждому герою и роли — от новичкового до продвинутого уровня.
+        </p>
+      </div>
+
+      <!-- Сборки -->
+      <div class="card scroll-reveal" data-delay="200ms" style="padding:28px 24px;">
+        <div style="width:44px;height:44px;border-radius:10px;background:var(--accent-dim);border:1px solid var(--border-hover);display:flex;align-items:center;justify-content:center;margin-bottom:18px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="7" height="7"/><rect x="15" y="3" width="7" height="7"/><rect x="15" y="14" width="7" height="7"/><rect x="2" y="14" width="7" height="7"/></svg>
+        </div>
+        <div style="font-family:'Russo One',sans-serif;font-size:16px;margin-bottom:8px;">Сборки</div>
+        <p style="font-size:13px;color:var(--text-2);line-height:1.65;margin:0;">
+          Оптимальные билды предметов для каждого героя, актуальные для текущего патча.
+        </p>
+      </div>
+
+      <!-- Драфт -->
+      <div class="card scroll-reveal" data-delay="300ms" style="padding:28px 24px;">
+        <div style="width:44px;height:44px;border-radius:10px;background:var(--accent-dim);border:1px solid var(--border-hover);display:flex;align-items:center;justify-content:center;margin-bottom:18px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </div>
+        <div style="font-family:'Russo One',sans-serif;font-size:16px;margin-bottom:8px;">Драфт-анализ</div>
+        <p style="font-size:13px;color:var(--text-2);line-height:1.65;margin:0;">
+          Составляй идеальный состав команды с учётом синергий и контр-пиков.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>

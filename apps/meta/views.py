@@ -6,7 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from apps.profile.auth import site_login_required
-from .models import Hero, Role, Patch, TierEntry, HeroVote
+from .models import Hero, Role, Patch, TierEntry, HeroVote, Item
 from .serializers import TierEntrySerializer, HeroSerializer, PatchSerializer
 
 
@@ -92,6 +92,18 @@ def vote(request, entry_id):
     return render(request, "meta/partials/vote_buttons.html", {
         "entry": entry,
         "user_vote": is_upvote if HeroVote.objects.filter(user=request.site_user, tier_entry=entry).exists() else None,
+    })
+
+
+def items_list(request):
+    category_filter = request.GET.get("category", "")
+    qs = Item.objects.all()
+    if category_filter:
+        qs = qs.filter(category=category_filter)
+    return render(request, "meta/items.html", {
+        "items":           qs,
+        "categories":      Item.CATEGORY_CHOICES,
+        "category_filter": category_filter,
     })
 
 

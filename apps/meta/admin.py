@@ -7,7 +7,19 @@ from django.shortcuts import render
 from django.urls import path, reverse
 from django import forms
 
-from .models import Hero, Role, Patch, TierEntry, HeroVote, HeroCounter, HeroSynergy
+from .models import Hero, Role, Patch, TierEntry, HeroVote, HeroCounter, HeroSynergy, Item
+
+
+@admin.register(Item)
+class ItemAdmin(admin.ModelAdmin):
+    list_display   = ("name_ru", "name", "category", "price", "patch")
+    list_filter    = ("category", "patch")
+    search_fields  = ("name", "name_ru")
+    prepopulated_fields = {"slug": ("name",)}
+    fieldsets = (
+        (None, {"fields": ("name", "name_ru", "slug", "category", "price", "patch")}),
+        ("Детали", {"fields": ("description", "icon")}),
+    )
 
 
 @admin.register(Role)

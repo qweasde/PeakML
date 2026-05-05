@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Билды — PeakML{% endblock %}
+
+{% block content %}
+<section style="padding:88px 0 64px;">
+  <div style="max-width:1160px;margin:0 auto;padding:0 24px;">
+
+    <div style="margin-bottom:48px;">
+      <span class="section-eyebrow">Билды</span>
+      <h1 style="font-family:'Russo One',sans-serif;font-size:clamp(28px,4vw,44px);margin-bottom:12px;">Сборки героев</h1>
+      <p style="font-size:15px;color:var(--text-2);max-width:520px;line-height:1.7;">Оптимальные билды предметов для каждого героя, актуальные для текущего патча.</p>
+    </div>
+
+    <!-- Фильтр по роли -->
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:36px;">
+      <a href="{% url 'builds:index' %}"
+        style="padding:7px 16px;border-radius:100px;font-size:13px;font-weight:500;text-decoration:none;border:1px solid {% if not role_filter %}var(--accent){% else %}var(--border){% endif %};background:{% if not role_filter %}var(--accent-dim){% else %}transparent{% endif %};color:{% if not role_filter %}var(--accent){% else %}var(--text-3){% endif %};">
+        Все
+      </a>
+      {% for role in roles %}
+      <a href="?role={{ role.slug }}"
+        style="padding:7px 16px;border-radius:100px;font-size:13px;font-weight:500;text-decoration:none;border:1px solid {% if role_filter == role.slug %}var(--accent){% else %}var(--border){% endif %};background:{% if role_filter == role.slug %}var(--accent-dim){% else %}transparent{% endif %};color:{% if role_filter == role.slug %}var(--accent){% else %}var(--text-3){% endif %};">
+        {{ role.name_ru }}
+      </a>
+      {% endfor %}
+    </div>
+
+    {% if builds %}
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;">
+      {% for build in builds %}
+      <div class="card scroll-reveal" data-delay="{{ forloop.counter0 }}00ms" style="padding:24px;">
+
+        <!-- Герой -->
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">
+          <div style="width:52px;height:52px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--border-hover);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;">
+            {% if build.hero.icon %}
+              <img src="{{ build.hero.icon.url }}" alt="{{ build.hero }}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
+            {% else %}
+              <span style="font-family:'Russo One',sans-serif;font-size:17px;color:var(--accent);">{{ build.hero.name_ru|slice:":2" }}</span>
+            {% endif %}
+          </div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;">{{ build.hero.role }}</div>
+            <div style="font-family:'Russo One',sans-serif;font-size:16px;color:var(--text-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ build.hero.name_ru }}</div>
+          </div>
+          {% if build.patch %}
+          <span style="flex-shrink:0;font-size:10px;font-weight:600;letter-spacing:.08em;padding:3px 9px;border-radius:100px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--border-hover);">
+            {{ build.patch.version }}
+          </span>
+          {% endif %}
+        </div>
+
+        <!-- Название -->
+        <div style="font-family:'Russo One',sans-serif;font-size:15px;margin-bottom:10px;">{{ build.title }}</div>
+
+        <!-- Предметы -->
+        {% with items=build.items.all %}
+        {% if items %}
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
+          {% for item in items %}
+          <div title="{{ item.name_ru }}" style="width:36px;height:36px;border-radius:8px;background:var(--surface-2);border:1px solid var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;">
+            {% if item.icon %}
+              <img src="{{ item.icon.url }}" alt="{{ item.name_ru }}" style="width:32px;height:32px;object-fit:cover;">
+            {% else %}
+              <span style="font-size:9px;color:var(--text-3);text-align:center;line-height:1.1;padding:2px;">{{ item.name_ru|slice:":3" }}</span>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        {% if build.description %}
+        <p style="font-size:13px;color:var(--text-2);line-height:1.6;margin:0;">{{ build.description|truncatechars:120 }}</p>
+        {% endif %}
+
+      </div>
+      {% endfor %}
+    </div>
+
+    {% else %}
+    <div style="text-align:center;padding:80px 24px;border:1px dashed var(--border);border-radius:var(--radius);">
+      <div style="font-size:36px;margin-bottom:12px;opacity:.4;">⚔️</div>
+      <div style="font-family:'Russo One',sans-serif;font-size:18px;margin-bottom:8px;">Сборки скоро появятся</div>
+      <p style="font-size:14px;color:var(--text-3);margin:0;">Актуальные билды для текущего патча уже готовятся</p>
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}

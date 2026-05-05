@@ -1,14 +1,21 @@
 from django.shortcuts import render
-from apps.meta.models import TierEntry, Patch
+from apps.meta.models import Patch
+from apps.guide.models import Guide, Build
+from .models import HomeSection
 
 
 def home(request):
     patch = Patch.objects.filter(is_current=True).first()
-    top_heroes = []
-    if patch:
-        top_heroes = (
-            TierEntry.objects.filter(patch=patch, tier="S")
-            .select_related("hero", "hero__role")
-            .order_by("-votes_up")[:6]
-        )
-    return render(request, "home.html", {"top_heroes": top_heroes, "patch": patch})
+
+    sections = HomeSection.objects.filter(is_enabled=True).order_by("order")
+
+    latest_guides = Guide.objects.filter(published=True).order_by("-created_at").select_related("series")[:3]
+
+    top_builds = Build.objects.filter(is_published=True).order_by("order", "-created_at").select_related("hero", "hero__role", "patch")[:4]
+
+    return render(request, "home.html", {
+        "patch":         patch,
+        "sections":      sections,
+        "latest_guides": latest_guides,
+        "top_builds":    top_builds,
+    })

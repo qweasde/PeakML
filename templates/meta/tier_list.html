@@ -49,9 +49,14 @@
               <span style="font-family:'Russo One',sans-serif;font-size:14px;color:var(--accent);">{{ entry.hero.name_ru|slice:":2" }}</span>
             {% endif %}
           </div>
-          <div>
+          <div style="min-width:0;">
             <div style="font-family:'Russo One',sans-serif;font-size:14px;color:var(--text-1);line-height:1.2;">{{ entry.hero.name_ru }}</div>
-            <div style="font-size:11px;color:var(--text-3);margin-top:2px;">{{ entry.hero.role.name_ru }}</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap;">
+              <span style="font-size:11px;color:var(--text-3);">{{ entry.hero.role.name_ru }}</span>
+              {% if entry.win_rate %}
+              <span style="font-size:10px;font-weight:700;color:#4ade80;background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.25);border-radius:4px;padding:1px 5px;white-space:nowrap;">{{ entry.win_rate|floatformat:1 }}% WR</span>
+              {% endif %}
+            </div>
           </div>
         </div>
 

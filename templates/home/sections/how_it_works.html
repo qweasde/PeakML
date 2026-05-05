@@ -1,0 +1,54 @@
+<section style="padding:88px 0;background:var(--bg);position:relative;">
+  <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--border-hover),transparent);" aria-hidden="true"></div>
+  <div style="max-width:1160px;margin:0 auto;padding:0 24px;">
+
+    <div style="text-align:center;margin-bottom:56px;">
+      {% if section.badge %}<span class="section-eyebrow">{{ section.badge }}</span>{% else %}<span class="section-eyebrow">Начало</span>{% endif %}
+      <h2 style="font-family:'Russo One',sans-serif;font-size:clamp(24px,3.5vw,36px);">{{ section.title|default:"Как это работает" }}</h2>
+      <p style="color:var(--text-2);margin-top:12px;font-size:15px;">{{ section.subtitle|default:"Три шага от регистрации до доминирования" }}</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:0;position:relative;">
+
+      <!-- Линия-коннектор (только десктоп) -->
+      <div style="position:absolute;top:36px;left:calc(16.6% + 24px);right:calc(16.6% + 24px);height:1px;background:linear-gradient(90deg,var(--border-hover),var(--border),var(--border-hover));pointer-events:none;" aria-hidden="true"></div>
+
+      <!-- Шаг 1 -->
+      <div class="scroll-reveal" data-delay="0ms" style="text-align:center;padding:0 32px 0;">
+        <div style="position:relative;display:inline-flex;width:72px;height:72px;border-radius:50%;background:var(--surface);border:1px solid var(--border-hover);align-items:center;justify-content:center;margin-bottom:24px;">
+          <span style="font-family:'Russo One',sans-serif;font-size:22px;color:var(--accent);">1</span>
+          <div style="position:absolute;inset:-1px;border-radius:50%;box-shadow:0 0 24px rgba(127,119,221,.18);pointer-events:none;"></div>
+        </div>
+        <div style="font-family:'Russo One',sans-serif;font-size:18px;margin-bottom:10px;">Изучи мету</div>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.7;margin:0;">
+          Открой тирлист и посмотри, какие герои сильны в текущем патче. Голосуй — влияй на рейтинг.
+        </p>
+      </div>
+
+      <!-- Шаг 2 -->
+      <div class="scroll-reveal" data-delay="150ms" style="text-align:center;padding:0 32px 0;">
+        <div style="position:relative;display:inline-flex;width:72px;height:72px;border-radius:50%;background:var(--surface);border:1px solid var(--border-hover);align-items:center;justify-content:center;margin-bottom:24px;">
+          <span style="font-family:'Russo One',sans-serif;font-size:22px;color:var(--accent);">2</span>
+          <div style="position:absolute;inset:-1px;border-radius:50%;box-shadow:0 0 24px rgba(127,119,221,.18);pointer-events:none;"></div>
+        </div>
+        <div style="font-family:'Russo One',sans-serif;font-size:18px;margin-bottom:10px;">Выбери стратегию</div>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.7;margin:0;">
+          Читай гайды, собирай оптимальные билды и анализируй драфт с помощью инструментов платформы.
+        </p>
+      </div>
+
+      <!-- Шаг 3 -->
+      <div class="scroll-reveal" data-delay="300ms" style="text-align:center;padding:0 32px 0;">
+        <div style="position:relative;display:inline-flex;width:72px;height:72px;border-radius:50%;background:var(--surface);border:1px solid var(--border-hover);align-items:center;justify-content:center;margin-bottom:24px;">
+          <span style="font-family:'Russo One',sans-serif;font-size:22px;color:var(--accent);">3</span>
+          <div style="position:absolute;inset:-1px;border-radius:50%;box-shadow:0 0 24px rgba(127,119,221,.18);pointer-events:none;"></div>
+        </div>
+        <div style="font-family:'Russo One',sans-serif;font-size:18px;margin-bottom:10px;">Доминируй</div>
+        <p style="font-size:14px;color:var(--text-2);line-height:1.7;margin:0;">
+          Применяй знания в реальных матчах. Расти в рейтинге и становись лучше с каждой игрой.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
