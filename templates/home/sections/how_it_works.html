@@ -8,13 +8,13 @@
       <p style="color:var(--text-2);margin-top:12px;font-size:15px;">{{ section.subtitle|default:"Три шага от регистрации до доминирования" }}</p>
     </div>
 
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:0;position:relative;">
+    <div class="hiw-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:0;position:relative;">
 
       <!-- Линия-коннектор (только десктоп) -->
-      <div style="position:absolute;top:36px;left:calc(16.6% + 24px);right:calc(16.6% + 24px);height:1px;background:linear-gradient(90deg,var(--border-hover),var(--border),var(--border-hover));pointer-events:none;" aria-hidden="true"></div>
+      <div class="hiw-connector" style="position:absolute;top:36px;left:calc(16.6% + 24px);right:calc(16.6% + 24px);height:1px;background:linear-gradient(90deg,var(--border-hover),var(--border),var(--border-hover));pointer-events:none;" aria-hidden="true"></div>
 
       <!-- Шаг 1 -->
-      <div class="scroll-reveal" data-delay="0ms" style="text-align:center;padding:0 32px 0;">
+      <div class="scroll-reveal hiw-step" data-delay="0ms" style="text-align:center;padding:0 32px 0;">
         <div style="position:relative;display:inline-flex;width:72px;height:72px;border-radius:50%;background:var(--surface);border:1px solid var(--border-hover);align-items:center;justify-content:center;margin-bottom:24px;">
           <span style="font-family:'Russo One',sans-serif;font-size:22px;color:var(--accent);">1</span>
           <div style="position:absolute;inset:-1px;border-radius:50%;box-shadow:0 0 24px rgba(127,119,221,.18);pointer-events:none;"></div>
@@ -26,7 +26,7 @@
       </div>
 
       <!-- Шаг 2 -->
-      <div class="scroll-reveal" data-delay="150ms" style="text-align:center;padding:0 32px 0;">
+      <div class="scroll-reveal hiw-step" data-delay="150ms" style="text-align:center;padding:0 32px 0;">
         <div style="position:relative;display:inline-flex;width:72px;height:72px;border-radius:50%;background:var(--surface);border:1px solid var(--border-hover);align-items:center;justify-content:center;margin-bottom:24px;">
           <span style="font-family:'Russo One',sans-serif;font-size:22px;color:var(--accent);">2</span>
           <div style="position:absolute;inset:-1px;border-radius:50%;box-shadow:0 0 24px rgba(127,119,221,.18);pointer-events:none;"></div>
@@ -38,7 +38,7 @@
       </div>
 
       <!-- Шаг 3 -->
-      <div class="scroll-reveal" data-delay="300ms" style="text-align:center;padding:0 32px 0;">
+      <div class="scroll-reveal hiw-step" data-delay="300ms" style="text-align:center;padding:0 32px 0;">
         <div style="position:relative;display:inline-flex;width:72px;height:72px;border-radius:50%;background:var(--surface);border:1px solid var(--border-hover);align-items:center;justify-content:center;margin-bottom:24px;">
           <span style="font-family:'Russo One',sans-serif;font-size:22px;color:var(--accent);">3</span>
           <div style="position:absolute;inset:-1px;border-radius:50%;box-shadow:0 0 24px rgba(127,119,221,.18);pointer-events:none;"></div>

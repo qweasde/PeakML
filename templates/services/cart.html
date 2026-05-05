@@ -16,7 +16,7 @@
     </div>
 
     {% if cart_items %}
-    <div style="display:grid;grid-template-columns:1fr 320px;gap:18px;">
+    <div class="cart-layout" style="display:grid;grid-template-columns:1fr 320px;gap:18px;">
       <div style="display:flex;flex-direction:column;gap:14px;">
         {% for item in cart_items %}
         <article class="card" style="padding:18px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:start;">

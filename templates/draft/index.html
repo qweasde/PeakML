@@ -136,7 +136,7 @@
     </div>
 
     <!-- Teams + Analyze -->
-    <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:24px;align-items:start;">
+    <div class="draft-teams-grid" style="display:grid;grid-template-columns:1fr auto 1fr;gap:24px;align-items:start;">
 
       <!-- Team A -->
       <div>
@@ -186,13 +186,13 @@
       </div>
 
       <!-- Center: VS + button -->
-      <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding-top:42px;min-width:180px;">
+      <div class="draft-vs-col" style="display:flex;flex-direction:column;align-items:center;gap:12px;padding-top:42px;min-width:180px;">
         <div style="font-family:'Russo One',sans-serif;font-size:28px;color:var(--text-3);letter-spacing:.06em;">VS</div>
         <button
           @click="analyze()"
           :disabled="!canAnalyze || loading"
           class="btn-primary"
-          style="width:100%;padding:14px 24px;font-size:13px;letter-spacing:.08em;transition:opacity 200ms;"
+          style="width:100%;padding:14px 24px;font-size:13px;letter-spacing:.08em;transition:opacity 200ms;justify-content:center;"
           :style="(!canAnalyze || loading) ? 'opacity:.4;cursor:not-allowed;' : ''"
         >
           <span x-text="loading ? '...' : 'Анализировать'"></span>

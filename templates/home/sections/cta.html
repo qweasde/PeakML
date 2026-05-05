@@ -25,10 +25,17 @@
     </p>
 
     <div style="display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;">
+      {% if request.site_user.is_authenticated %}
+      <a href="{% url 'draft:index' %}" class="btn-primary" style="font-size:15px;padding:15px 32px;">
+        Перейти к анализу
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+      </a>
+      {% else %}
       <a href="{% url 'account_signup' %}" class="btn-primary" style="font-size:15px;padding:15px 32px;">
         Начать бесплатно
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
       </a>
+      {% endif %}
       <a href="{% url 'meta:index' %}" style="display:inline-flex;align-items:center;gap:8px;color:var(--text-2);text-decoration:none;padding:15px 20px;font-size:14px;transition:color 150ms;" onmouseover="this.style.color='var(--text-1)'" onmouseout="this.style.color='var(--text-2)'">
         Смотреть мета-тирлист →
       </a>

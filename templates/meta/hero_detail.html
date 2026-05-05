@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+{% block title %}{{ hero.name_ru }} — Гайд и сборки{% endblock %}
+{% block meta_desc %}{{ hero.name_ru }}: сборки, контрпики и гайды в Mobile Legends.{% endblock %}
+
+{% block extra_css %}
+<style>
+.hero-stat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  background: var(--surface);
+}
+.section-title {
+  font-family: 'Russo One', sans-serif;
+  font-size: 18px;
+  color: var(--text-1);
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.counter-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+.counter-hard { background: rgba(248,113,113,.15); color: #f87171; border: 1px solid rgba(248,113,113,.3); }
+.counter-soft { background: rgba(251,191,36,.1); color: #fbbf24; border: 1px solid rgba(251,191,36,.25); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="max-width:1160px;margin:0 auto;padding:32px 24px;">
+
+  <!-- Хлебные крошки -->
+  <div style="font-size:13px;color:var(--text-3);margin-bottom:24px;">
+    <a href="{% url 'meta:index' %}" style="color:var(--text-3);text-decoration:none;">Тирлист</a>
+    <span style="margin:0 6px;">›</span>
+    <span style="color:var(--text-2);">{{ hero.name_ru }}</span>
+  </div>
+
+  <!-- Шапка героя -->
+  <div class="hero-detail-head" style="display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap;margin-bottom:40px;">
+    <div style="flex-shrink:0;">
+      {% if hero.image %}
+        <img src="{{ hero.image.url }}" alt="{{ hero.name_ru }}"
+             class="hero-detail-image" style="width:140px;height:140px;border-radius:16px;object-fit:cover;border:1px solid var(--border);">
+      {% elif hero.icon %}
+        <img src="{{ hero.icon.url }}" alt="{{ hero.name_ru }}"
+             class="hero-detail-image" style="width:140px;height:140px;border-radius:16px;object-fit:cover;border:1px solid var(--border);">
+      {% else %}
+        <div class="hero-detail-image" style="width:140px;height:140px;border-radius:16px;background:var(--accent-dim);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;">
+          <span style="font-family:'Russo One',sans-serif;font-size:36px;color:var(--accent);">{{ hero.name_ru|slice:":2" }}</span>
+        </div>
+      {% endif %}
+    </div>
+
+    <div style="flex:1;min-width:0;">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px;">
+        <h1 style="font-family:'Russo One',sans-serif;font-size:clamp(24px,4vw,36px);margin:0;">{{ hero.name_ru }}</h1>
+        <span style="font-size:13px;color:var(--text-3);">{{ hero.name }}</span>
+        {% if tier_entry %}
+        <span class="tier-badge tier-{{ tier_entry.tier }}" style="width:32px;height:32px;font-size:16px;">{{ tier_entry.tier }}</span>
+        {% endif %}
+      </div>
+
+      <!-- Роль -->
+      <div style="font-size:14px;color:var(--text-2);margin-bottom:14px;">
+        {{ hero.role.name_ru }}{% if hero.secondary_role %} / {{ hero.secondary_role.name_ru }}{% endif %}
+      </div>
+
+      <!-- Чипсы характеристик -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+        {% if hero.damage_type %}
+        <span class="hero-stat-chip">{{ hero.get_damage_type_display }}</span>
+        {% endif %}
+        {% if hero.game_phase %}
+        <span class="hero-stat-chip">{{ hero.get_game_phase_display }}</span>
+        {% endif %}
+        {% if hero.mobility %}
+        <span class="hero-stat-chip">Мобильность: {{ hero.get_mobility_display }}</span>
+        {% endif %}
+        {% if hero.has_cc %}
+        <span class="hero-stat-chip" style="color:#60a5fa;border-color:rgba(96,165,250,.3);">Контроль</span>
+        {% endif %}
+        {% if hero.has_sustain %}
+        <span class="hero-stat-chip" style="color:#4ade80;border-color:rgba(74,222,128,.3);">Восстановление</span>
+        {% endif %}
+      </div>
+
+      <!-- Статистика из тирлиста -->
+      {% if tier_entry %}
+      <div class="hero-stats-row" style="display:flex;gap:10px;flex-wrap:wrap;">
+        {% if tier_entry.win_rate %}
+        <div style="text-align:center;padding:10px 16px;background:rgba(74,222,128,.07);border:1px solid rgba(74,222,128,.2);border-radius:10px;">
+          <div style="font-size:18px;font-weight:700;color:#4ade80;">{{ tier_entry.win_rate|floatformat:1 }}%</div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:2px;">Win Rate</div>
+        </div>
+        {% endif %}
+        {% if tier_entry.pick_rate %}
+        <div style="text-align:center;padding:10px 16px;background:rgba(96,165,250,.07);border:1px solid rgba(96,165,250,.2);border-radius:10px;">
+          <div style="font-size:18px;font-weight:700;color:#60a5fa;">{{ tier_entry.pick_rate|floatformat:1 }}%</div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:2px;">Pick Rate</div>
+        </div>
+        {% endif %}
+        {% if tier_entry.ban_rate %}
+        <div style="text-align:center;padding:10px 16px;background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.2);border-radius:10px;">
+          <div style="font-size:18px;font-weight:700;color:#f87171;">{{ tier_entry.ban_rate|floatformat:1 }}%</div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:2px;">Ban Rate</div>
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Описание -->
+  {% if hero.description %}
+  <div style="margin-bottom:40px;">
+    <div class="section-title">О герое</div>
+    <p style="color:var(--text-2);font-size:15px;line-height:1.7;max-width:760px;">{{ hero.description }}</p>
+  </div>
+  {% endif %}
+
+  <!-- Лучшие сборки -->
+  <div style="margin-bottom:40px;">
+    <div class="section-title">Лучшие сборки</div>
+    {% if builds %}
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      {% for build in builds %}
+      <div class="card" style="padding:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
+          <div>
+            <div style="font-family:'Russo One',sans-serif;font-size:15px;color:var(--text-1);">{{ build.title }}</div>
+            {% if build.patch %}
+            <div style="font-size:12px;color:var(--text-3);margin-top:3px;">Патч {{ build.patch.version }}</div>
+            {% endif %}
+          </div>
+        </div>
+        {% if build.items.all %}
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+          {% for item in build.items.all %}
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+            {% if item.icon %}
+            <img src="{{ item.icon.url }}" alt="{{ item.name_ru }}"
+                 style="width:44px;height:44px;border-radius:8px;border:1px solid var(--border);object-fit:cover;"
+                 title="{{ item.name_ru }}">
+            {% else %}
+            <div style="width:44px;height:44px;border-radius:8px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;">
+              <span style="font-size:10px;color:var(--text-3);">{{ item.name_ru|slice:":3" }}</span>
+            </div>
+            {% endif %}
+            <span style="font-size:10px;color:var(--text-3);text-align:center;max-width:48px;line-height:1.2;">{{ item.name_ru }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% if build.description %}
+        <p style="font-size:13px;color:var(--text-2);line-height:1.6;margin:0;">{{ build.description }}</p>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div style="padding:32px;text-align:center;color:var(--text-3);border:1px dashed var(--border);border-radius:12px;">
+      Сборки пока не добавлены
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Контрпики -->
+  <div style="margin-bottom:40px;">
+    <div class="section-title">Контрпики</div>
+    {% if counters %}
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;">
+      {% for counter in counters %}
+      <a href="{% url 'meta:hero_detail' counter.countered_by.slug %}"
+         style="display:flex;align-items:center;gap:10px;padding:12px;text-decoration:none;border-radius:10px;border:1px solid var(--border);background:var(--surface);transition:border-color 150ms;"
+         onmouseover="this.style.borderColor='var(--accent-dim)'"
+         onmouseout="this.style.borderColor='var(--border)'">
+        {% if counter.countered_by.icon %}
+        <img src="{{ counter.countered_by.icon.url }}" alt="{{ counter.countered_by.name_ru }}"
+             style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;">
+        {% else %}
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <span style="font-size:12px;color:var(--accent);">{{ counter.countered_by.name_ru|slice:":2" }}</span>
+        </div>
+        {% endif %}
+        <div style="min-width:0;">
+          <div style="font-size:13px;color:var(--text-1);font-weight:600;">{{ counter.countered_by.name_ru }}</div>
+          <span class="counter-badge counter-{{ counter.strength }}">{{ counter.get_strength_display }}</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div style="padding:32px;text-align:center;color:var(--text-3);border:1px dashed var(--border);border-radius:12px;">
+      Контрпики пока не добавлены
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Гайды -->
+  <div style="margin-bottom:40px;">
+    <div class="section-title">Гайды</div>
+    {% if guides %}
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      {% for guide in guides %}
+      <a href="{% url 'guide:detail' guide.slug %}"
+         style="display:flex;align-items:flex-start;gap:16px;padding:18px 20px;text-decoration:none;border-radius:12px;border:1px solid var(--border);background:var(--surface);transition:border-color 150ms;"
+         onmouseover="this.style.borderColor='var(--accent-dim)'"
+         onmouseout="this.style.borderColor='var(--border)'">
+        {% if guide.cover %}
+        <img src="{{ guide.cover.url }}" alt="{{ guide.title }}"
+             style="width:64px;height:64px;border-radius:8px;object-fit:cover;flex-shrink:0;">
+        {% endif %}
+        <div style="flex:1;min-width:0;">
+          <div style="font-family:'Russo One',sans-serif;font-size:14px;color:var(--text-1);margin-bottom:4px;">{{ guide.title }}</div>
+          {% if guide.excerpt %}
+          <div style="font-size:13px;color:var(--text-3);line-height:1.5;">{{ guide.excerpt|truncatechars:120 }}</div>
+          {% endif %}
+          <div style="display:flex;gap:8px;align-items:center;margin-top:8px;">
+            <span style="font-size:11px;color:var(--text-3);">{{ guide.get_difficulty_display }}</span>
+            <span style="font-size:11px;color:var(--text-3);">·</span>
+            <span style="font-size:11px;color:var(--text-3);">{{ guide.views }} просмотров</span>
+          </div>
+        </div>
+        <span style="font-size:18px;color:var(--text-3);flex-shrink:0;">›</span>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div style="padding:32px;text-align:center;color:var(--text-3);border:1px dashed var(--border);border-radius:12px;">
+      Гайды пока не добавлены
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

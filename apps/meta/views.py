@@ -6,7 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from apps.profile.auth import site_login_required
-from .models import Hero, Role, Patch, TierEntry, HeroVote, Item
+from .models import Hero, Role, Patch, TierEntry, HeroVote, Item, HeroCounter
 from .serializers import TierEntrySerializer, HeroSerializer, PatchSerializer
 
 
@@ -92,6 +92,39 @@ def vote(request, entry_id):
     return render(request, "meta/partials/vote_buttons.html", {
         "entry": entry,
         "user_vote": is_upvote if HeroVote.objects.filter(user=request.site_user, tier_entry=entry).exists() else None,
+    })
+
+
+def hero_detail(request, slug):
+    hero = get_object_or_404(Hero.objects.select_related("role", "secondary_role"), slug=slug)
+    patch = Patch.objects.filter(is_current=True).first()
+    tier_entry = TierEntry.objects.filter(hero=hero, patch=patch).first() if patch else None
+
+    counters = (
+        HeroCounter.objects
+        .filter(hero=hero)
+        .select_related("countered_by", "countered_by__role")
+        .order_by("strength")
+    )
+    builds = (
+        hero.builds
+        .filter(is_published=True)
+        .prefetch_related("items")
+        .order_by("order", "-created_at")
+    )
+    guides = (
+        hero.guides
+        .filter(published=True)
+        .order_by("order", "-created_at")
+    )
+
+    return render(request, "meta/hero_detail.html", {
+        "hero": hero,
+        "tier_entry": tier_entry,
+        "patch": patch,
+        "counters": counters,
+        "builds": builds,
+        "guides": guides,
     })
 
 

@@ -2,6 +2,41 @@
 {% block title %}Мета-тирлист{% endblock %}
 {% block meta_desc %}Тирлист героев Mobile Legends по текущему патчу с голосованием сообщества.{% endblock %}
 
+{% block extra_css %}
+<style>
+.stat-badge-wrap { position: relative; display: inline-flex; }
+.stat-badge-wrap .stat-tooltip {
+  position: absolute;
+  bottom: calc(100% + 7px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0f0f1a;
+  border: 1px solid rgba(148,163,184,.25);
+  color: #cbd5e1;
+  font-size: 11px;
+  font-family: inherit;
+  letter-spacing: .03em;
+  white-space: nowrap;
+  padding: 5px 10px;
+  border-radius: 7px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 160ms;
+  z-index: 30;
+}
+.stat-badge-wrap .stat-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: rgba(148,163,184,.25);
+}
+.stat-badge-wrap:hover .stat-tooltip { opacity: 1; }
+</style>
+{% endblock %}
+
 {% block content %}
 <div style="max-width:1160px;margin:0 auto;padding:32px 24px;">
 
@@ -12,7 +47,7 @@
       <p style="color:var(--text-2);font-size:15px;margin-top:8px;">Обновляется сообществом после каждого патча.</p>
     </div>
 
-    <form method="get" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+    <form method="get" class="tier-filters" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
       {% if patches %}
       <select name="patch" onchange="this.form.submit()" style="background:var(--surface);border:1px solid var(--border);color:var(--text-1);border-radius:8px;padding:8px 14px;font-family:inherit;font-size:13px;cursor:pointer;">
         {% for p in patches %}
@@ -40,7 +75,9 @@
 
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;">
       {% for entry in tier_entries %}
-      <div class="card" style="padding:18px 16px;display:flex;flex-direction:column;gap:12px;">
+      <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:12px;cursor:pointer;" onclick="window.location='{% url 'meta:hero_detail' entry.hero.slug %}';">
+
+        <!-- иконка + имя/роль + лайки -->
         <div style="display:flex;align-items:center;gap:12px;">
           <div style="width:44px;height:44px;background:var(--accent-dim);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
             {% if entry.hero.icon %}
@@ -49,20 +86,39 @@
               <span style="font-family:'Russo One',sans-serif;font-size:14px;color:var(--accent);">{{ entry.hero.name_ru|slice:":2" }}</span>
             {% endif %}
           </div>
-          <div style="min-width:0;">
+          <div style="min-width:0;flex:1;">
             <div style="font-family:'Russo One',sans-serif;font-size:14px;color:var(--text-1);line-height:1.2;">{{ entry.hero.name_ru }}</div>
-            <div style="display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap;">
-              <span style="font-size:11px;color:var(--text-3);">{{ entry.hero.role.name_ru }}</span>
-              {% if entry.win_rate %}
-              <span style="font-size:10px;font-weight:700;color:#4ade80;background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.25);border-radius:4px;padding:1px 5px;white-space:nowrap;">{{ entry.win_rate|floatformat:1 }}% WR</span>
-              {% endif %}
+            <div style="font-size:11px;color:var(--text-3);margin-top:3px;">{{ entry.hero.role.name_ru }}</div>
+            <div style="margin-top:6px;" id="vote-{{ entry.pk }}">
+              {% include "meta/partials/vote_buttons.html" with entry=entry user_vote=user_votes|default_if_none:"" %}
             </div>
           </div>
         </div>
 
-        <div id="vote-{{ entry.pk }}">
-          {% include "meta/partials/vote_buttons.html" with entry=entry user_vote=user_votes|default_if_none:"" %}
+        <!-- бейджи внизу -->
+        {% if entry.win_rate or entry.pick_rate or entry.ban_rate %}
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding-top:8px;border-top:1px solid var(--border);">
+          {% if entry.win_rate %}
+          <div class="stat-badge-wrap">
+            <span style="font-size:11px;font-weight:700;color:#4ade80;background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.25);border-radius:5px;padding:3px 8px;white-space:nowrap;">{{ entry.win_rate|floatformat:1 }}% WR</span>
+            <div class="stat-tooltip">Win Rate — процент побед героя</div>
+          </div>
+          {% endif %}
+          {% if entry.pick_rate %}
+          <div class="stat-badge-wrap">
+            <span style="font-size:11px;font-weight:700;color:#60a5fa;background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.25);border-radius:5px;padding:3px 8px;white-space:nowrap;">{{ entry.pick_rate|floatformat:1 }}% PR</span>
+            <div class="stat-tooltip">Pick Rate — как часто берут героя</div>
+          </div>
+          {% endif %}
+          {% if entry.ban_rate %}
+          <div class="stat-badge-wrap">
+            <span style="font-size:11px;font-weight:700;color:#f87171;background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.25);border-radius:5px;padding:3px 8px;white-space:nowrap;">{{ entry.ban_rate|floatformat:1 }}% BR</span>
+            <div class="stat-tooltip">Ban Rate — как часто банят героя</div>
+          </div>
+          {% endif %}
         </div>
+        {% endif %}
+
       </div>
       {% endfor %}
     </div>

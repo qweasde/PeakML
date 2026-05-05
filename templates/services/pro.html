@@ -4,7 +4,7 @@
 {% block meta_desc %}Подписка PRO: мета-дайджест, база гайдов, чат с экспертом и разборы реплеев.{% endblock %}
 
 {% block content %}
-<section style="position:relative;overflow:hidden;padding:36px 24px 56px;">
+<section class="sub-section" style="position:relative;overflow:hidden;padding:36px 24px 56px;">
   <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(127,119,221,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(127,119,221,.04) 1px,transparent 1px);background-size:48px 48px;" aria-hidden="true"></div>
   <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 55% at 50% 0%,rgba(124,58,237,.08),transparent 68%);" aria-hidden="true"></div>
 
@@ -19,9 +19,9 @@
     <div style="position:relative;margin-bottom:56px;padding:20px 0;">
       
       <!-- Адаптивная сетка тарифов -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;align-items:start;">
+      <div class="plans-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;align-items:start;">
         {% for plan in plans %}
-        <article style="width:100%;padding:{% if plan.is_featured %}32{% else %}24{% endif %}px;border-radius:16px;display:flex;flex-direction:column;gap:{% if plan.is_featured %}20{% else %}16{% endif %}px;{% if plan.is_featured %}border:2px solid #a855f7;background:linear-gradient(135deg,rgba(168,85,247,.2),rgba(124,58,237,.1));transform:translateY(-2px);box-shadow:0 20px 60px rgba(168,85,247,.16){% else %}border:1px solid var(--border);background:rgba(255,255,255,.02){% endif %}">
+        <article class="{% if plan.is_featured %}plan-featured{% endif %}" style="width:100%;padding:{% if plan.is_featured %}32{% else %}24{% endif %}px;border-radius:16px;display:flex;flex-direction:column;gap:{% if plan.is_featured %}20{% else %}16{% endif %}px;{% if plan.is_featured %}border:2px solid #a855f7;background:linear-gradient(135deg,rgba(168,85,247,.2),rgba(124,58,237,.1));transform:translateY(-2px);box-shadow:0 20px 60px rgba(168,85,247,.16){% else %}border:1px solid var(--border);background:rgba(255,255,255,.02){% endif %}">
           
           <!-- Заголовок -->
           <div>

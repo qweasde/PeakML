@@ -58,6 +58,7 @@ class Hero(models.Model):
     mobility = models.CharField(max_length=10, choices=MOBILITY_CHOICES, blank=True, default="", verbose_name="Мобильность")
     has_cc = models.BooleanField(default=False, verbose_name="Есть контроль")
     has_sustain = models.BooleanField(default=False, verbose_name="Есть восстановление")
+    description = models.TextField(blank=True, verbose_name="Описание")
 
     class Meta:
         verbose_name = "Герой"

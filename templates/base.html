@@ -19,6 +19,34 @@
     .tab-btn-active { background: rgba(127,119,221,.2); color: #7f77dd; }
     .tab-btn-idle   { background: rgba(255,255,255,.05); color: var(--text-3); }
     .tab-btn-idle:hover { color: var(--text-1); }
+
+    /* ── Navbar ──────────────────────────────────────────── */
+    /* Десктопная навигация: флекс на 768px+, скрыта на мобиле */
+    #nav-desktop { display: none; }
+    @media (min-width: 768px) {
+      #nav-desktop { display: flex; }
+      #nav-burger-btn { display: none !important; }
+      .nav-cart, .nav-profile { display: flex !important; }
+      .nav-login-desktop, .nav-reg-desktop { display: inline-flex; }
+    }
+    /* Бургер-кнопка: скрыта на десктопе, видна на мобиле */
+    #nav-burger-btn { display: flex; }
+    .nav-login-desktop, .nav-reg-desktop { display: none; }
+
+    /* Мобильное меню: скрыто по умолчанию */
+    #nav-mobile-menu { display: none; }
+    #nav-mobile-menu.nav-menu-open { display: block; }
+
+    /* Анимация линий бургера */
+    .burger-line {
+      display: block; width: 22px; height: 2px;
+      background: var(--text-1); border-radius: 2px;
+      transition: transform 250ms, opacity 250ms;
+    }
+    .nav-burger-open .burger-top { transform: translateY(7px) rotate(45deg); }
+    .nav-burger-open .burger-mid { opacity: 0; }
+    .nav-burger-open .burger-bot { transform: translateY(-7px) rotate(-45deg); }
+    /* ── /Navbar ─────────────────────────────────────────── */
     @keyframes logo-to-cyan {
       from { transform: rotate(0deg);   filter: none; }
       to   { transform: rotate(90deg);  filter: hue-rotate(150deg) brightness(1.7) drop-shadow(0 0 10px #00e5ff); }
@@ -42,6 +70,88 @@
       background: rgba(127,119,221,.12);
       color: var(--text-1);
     }
+    /* ── Mobile ─────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      body { overflow-x: hidden; }
+
+      /* Hero-секция: меньше вертикальных отступов */
+      .hero-content { padding: 32px 20px 44px !important; }
+
+      /* Stat-блоки: вертикальный стек без правого бордера */
+      .hero-stats { flex-direction: column !important; gap: 0 !important; }
+      .stat-block {
+        padding: 14px 0 !important;
+        border-right: none !important;
+        border-bottom: 1px solid var(--border) !important;
+        width: 100%;
+      }
+      .stat-block:last-child { border-bottom: none !important; }
+
+      /* Карточки: меньше внутренних отступов */
+      .card { padding: 14px !important; }
+
+      /* Профиль: имя не обрезает текст */
+      .profile-display-name {
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: unset !important;
+        font-size: 17px !important;
+      }
+      /* Профиль: шапка */
+      .profile-header-inner { padding: 16px !important; }
+      /* Профиль: форма — одна колонка */
+      .profile-field-grid { grid-template-columns: 1fr !important; }
+      /* Профиль: поля формы */
+      .profile-form-body { padding: 16px !important; }
+      /* Профиль: кнопки под формой */
+      .profile-form-footer { padding: 14px 16px !important; flex-wrap: wrap !important; }
+
+      /* Тирлист: фильтры на всю ширину */
+      .tier-filters { width: 100% !important; }
+      .tier-filters select { flex: 1 !important; min-height: 44px !important; }
+
+      /* Страница подписки / PRO */
+      .sub-section { padding: 32px 16px 48px !important; }
+      .sub-header { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
+      .sub-features-grid { grid-template-columns: 1fr !important; }
+      .sub-services-grid { grid-template-columns: 1fr !important; }
+      .plans-grid { grid-template-columns: 1fr !important; }
+      .plan-featured { transform: none !important; }
+
+      /* "Как это работает": скрываем коннектор, добавляем отступы */
+      .hiw-connector { display: none !important; }
+      .hiw-grid { gap: 0 !important; }
+      .hiw-step { padding: 28px 20px !important; border-bottom: 1px solid var(--border); }
+      .hiw-step:last-child { border-bottom: none !important; }
+
+      /* Hero-детальная: шапка */
+      .hero-detail-head { gap: 16px !important; }
+      .hero-detail-image { width: 100px !important; height: 100px !important; }
+      .hero-stats-row { flex-wrap: wrap !important; }
+
+      /* Navbar: корзина и профиль скрыты на мобиле (они в бургер-меню) */
+      .nav-cart, .nav-profile { display: none !important; }
+
+      /* Драфт: команды стекируются вертикально */
+      .draft-teams-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+      }
+      .draft-vs-col {
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        padding-top: 0 !important;
+        min-width: unset !important;
+        justify-content: center !important;
+      }
+      .draft-vs-col > button,
+      .draft-vs-col > div { flex: 1 1 140px; max-width: 280px; }
+
+      /* Корзина: одна колонка */
+      .cart-layout { grid-template-columns: 1fr !important; }
+    }
+    /* ── /Mobile ─────────────────────────────────────────── */
+
     /* Scroll reveal */
     .scroll-reveal {
       opacity: 0;

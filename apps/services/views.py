@@ -41,6 +41,28 @@ def pro(request):
     })
 
 
+def my_subscription(request):
+    site_user = getattr(request, "site_user", None)
+    if not site_user or not site_user.is_authenticated:
+        return redirect("services:pro")
+
+    plan = getattr(site_user, "subscription_plan", None)
+    if plan:
+        plan.description_lines = [line.strip() for line in plan.description.splitlines() if line.strip()]
+
+    pro_services = Service.objects.filter(is_active=True, is_pro=True)
+    plans = []
+    if not plan:
+        plans = list(SubscriptionPlan.objects.filter(is_active=True).order_by("sort_order"))
+        for p in plans:
+            p.description_lines = [line.strip() for line in p.description.splitlines() if line.strip()]
+    return render(request, "services/my_subscription.html", {
+        "plan": plan,
+        "pro_services": pro_services,
+        "plans": plans,
+    })
+
+
 @require_POST
 def add_to_cart(request, service_id):
     service = get_object_or_404(Service, pk=service_id, is_active=True)

@@ -46,8 +46,8 @@
   <div style="position:relative;z-index:2;max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:16px;">
 
     <!-- ── Шапка профиля ── -->
-    <div class="profile-card" style="padding:24px 28px;">
-      <div style="display:flex;align-items:center;gap:0;flex-wrap:wrap;row-gap:16px;">
+    <div class="profile-card">
+      <div class="profile-header-inner" style="padding:24px 28px;display:flex;align-items:center;gap:0;flex-wrap:wrap;row-gap:16px;">
 
         <!-- Аватар -->
         <div style="position:relative;flex-shrink:0;margin-right:18px;">
@@ -65,7 +65,7 @@
         <!-- Имя и email -->
         <div style="flex:1;min-width:0;">
           <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:3px;">Личный кабинет</div>
-          <div style="font-family:'Russo One',sans-serif;font-size:20px;color:var(--text-1);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ site_user.full_name|default:"—" }}</div>
+          <div class="profile-display-name" style="font-family:'Russo One',sans-serif;font-size:20px;color:var(--text-1);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ site_user.full_name|default:"—" }}</div>
           <div style="font-size:13px;color:var(--text-3);margin-top:2px;">{{ site_user.email }}</div>
         </div>
 
@@ -156,7 +156,7 @@
             </div>
           </div>
 
-          <div style="padding:20px 24px 20px;" class="profile-field-grid">
+          <div class="profile-field-grid profile-form-body" style="padding:20px 24px 20px;">
             <div class="form-group full">
               <label class="form-label" for="{{ form.full_name.id_for_label }}">ФИО</label>
               {{ form.full_name }}
@@ -189,7 +189,7 @@
             </div>
           </div>
 
-          <div style="padding:16px 24px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;">
+          <div class="profile-form-footer" style="padding:16px 24px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;">
             <button type="submit" class="btn-primary" style="height:42px;padding:0 22px;font-size:13px;">Сохранить</button>
             <a href="{% url 'core:home' %}" class="btn-outline" style="height:42px;padding:0 18px;font-size:13px;">На главную</a>
           </div>

@@ -32,6 +32,10 @@ class Guide(models.Model):
     series = models.ForeignKey(
         GuideSeries, on_delete=models.SET_NULL, null=True, blank=True, related_name="guides"
     )
+    hero = models.ForeignKey(
+        "meta.Hero", on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="guides", verbose_name="Герой"
+    )
     title = models.CharField(max_length=200)
     slug = models.SlugField(unique=True, max_length=220)
     excerpt = models.TextField(max_length=400, blank=True)

@@ -6,7 +6,7 @@
   backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
   border-bottom:1px solid var(--border);
   transition:background 200ms;
-" aria-label="Основная навигация" x-data="{ open: false }">
+" aria-label="Основная навигация">
 
   <div style="display:flex;align-items:center;justify-content:space-between;height:64px;max-width:1160px;margin:0 auto;padding:0 24px;">
 
@@ -15,7 +15,8 @@
       {{ site_name }}
     </a>
 
-    <ul style="display:flex;align-items:center;gap:28px;list-style:none;" class="hidden md:flex">
+    <!-- Десктопная навигация — скрыта на мобиле через CSS -->
+    <ul id="nav-desktop" style="align-items:center;gap:28px;list-style:none;">
       <li style="position:relative;" x-data="{ metaOpen: false }" @mouseenter="metaOpen=true" @mouseleave="metaOpen=false">
         <button class="nav-link {% if request.resolver_match.namespace == 'meta' or request.resolver_match.namespace == 'builds' %}active{% endif %}"
           style="background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:4px;"
@@ -31,14 +32,20 @@
         </div>
       </li>
       <li><a href="{% url 'services:index' %}" class="nav-link {% if request.resolver_match.namespace == 'services' and request.resolver_match.url_name != 'pro' %}active{% endif %}">Услуги</a></li>
-      <li><a href="{% url 'services:pro' %}" style="border:1px solid #a855f7;background:rgba(168,85,247,.14);color:#c084fc;font-weight:700;border-radius:999px;padding:10px 16px;text-decoration:none;">PRO</a></li>
+      <li>
+        {% if user.is_authenticated %}
+        <a href="{% url 'services:my_subscription' %}" style="border:1px solid #a855f7;background:rgba(168,85,247,.14);color:#c084fc;font-weight:700;border-radius:999px;padding:10px 16px;text-decoration:none;">PRO</a>
+        {% else %}
+        <a href="{% url 'services:pro' %}" style="border:1px solid #a855f7;background:rgba(168,85,247,.14);color:#c084fc;font-weight:700;border-radius:999px;padding:10px 16px;text-decoration:none;">PRO</a>
+        {% endif %}
+      </li>
       <li><a href="{% url 'draft:index' %}" class="nav-link {% if request.resolver_match.namespace == 'draft' %}active{% endif %}">Драфт</a></li>
       <li><a href="{% url 'guide:index' %}" class="nav-link {% if request.resolver_match.namespace == 'guide' %}active{% endif %}">Гайды</a></li>
     </ul>
 
     <div style="display:flex;align-items:center;gap:12px;">
       {% if user.is_authenticated %}
-        <a href="{% url 'services:cart' %}" style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,.03);transition:border-color 180ms,background 180ms;" onmouseover="this.style.borderColor='var(--accent)';this.style.background='rgba(127,119,221,.08)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='rgba(255,255,255,.03)'" aria-label="Корзина услуг">
+        <a href="{% url 'services:cart' %}" class="nav-cart" style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,.03);transition:border-color 180ms,background 180ms;" onmouseover="this.style.borderColor='var(--accent)';this.style.background='rgba(127,119,221,.08)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='rgba(255,255,255,.03)'" aria-label="Корзина услуг">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-1);">
             <path d="M6 6h15l-1.5 9h-13z" />
             <path d="M6 6l-2-4H1" />
@@ -46,41 +53,45 @@
             <path d="M18 19a2 2 0 1 0 0 4 2 2 0 0 0 0-4z" />
           </svg>
         </a>
-        <a href="{% url 'profile:detail' %}" style="display:flex;align-items:center;gap:9px;text-decoration:none;padding:6px 14px 6px 6px;border:1px solid var(--border);border-radius:50px;background:rgba(255,255,255,.03);transition:border-color 180ms,background 180ms;" onmouseover="this.style.borderColor='var(--accent)';this.style.background='rgba(127,119,221,.08)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='rgba(255,255,255,.03)'">
+        <a href="{% url 'profile:detail' %}" class="nav-profile" style="display:flex;align-items:center;gap:9px;text-decoration:none;padding:6px 14px 6px 6px;border:1px solid var(--border);border-radius:50px;background:rgba(255,255,255,.03);transition:border-color 180ms,background 180ms;" onmouseover="this.style.borderColor='var(--accent)';this.style.background='rgba(127,119,221,.08)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='rgba(255,255,255,.03)'">
           <span style="width:30px;height:30px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Russo One',sans-serif;font-size:12px;color:var(--accent);">{{ user.full_name|default:user.email|slice:":1"|upper }}</span>
           <span style="font-size:13px;color:var(--text-2);font-weight:500;">Профиль</span>
         </a>
       {% else %}
-        <a href="{% url 'account_login' %}" class="nav-link hidden md:inline">Войти</a>
-        <a href="{% url 'account_signup' %}" class="btn-outline" style="padding:8px 16px;font-size:13px;">Регистрация</a>
+        <a href="{% url 'account_login' %}" class="nav-link nav-login-desktop">Войти</a>
+        <a href="{% url 'account_signup' %}" class="btn-outline nav-reg-desktop" style="padding:8px 16px;font-size:13px;">Регистрация</a>
       {% endif %}
 
-      <button @click="open = !open" :aria-expanded="open.toString()" aria-label="Меню"
-        style="display:flex;flex-direction:column;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;padding:10px;min-width:44px;min-height:44px;"
-        class="md:hidden">
-        <span style="display:block;width:22px;height:2px;background:var(--text-1);border-radius:2px;transition:transform 250ms,opacity 250ms;"
-          :style="open ? 'transform:translateY(7px) rotate(45deg)' : ''"></span>
-        <span style="display:block;width:22px;height:2px;background:var(--text-1);border-radius:2px;transition:opacity 250ms;"
-          :style="open ? 'opacity:0' : ''"></span>
-        <span style="display:block;width:22px;height:2px;background:var(--text-1);border-radius:2px;transition:transform 250ms;"
-          :style="open ? 'transform:translateY(-7px) rotate(-45deg)' : ''"></span>
+      <!-- Бургер-кнопка: только на мобиле, управляется vanilla JS -->
+      <button id="nav-burger-btn" onclick="navMenuToggle()" aria-label="Меню" aria-expanded="false"
+        style="flex-direction:column;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;padding:10px;min-width:44px;min-height:44px;">
+        <span class="burger-line burger-top"></span>
+        <span class="burger-line burger-mid"></span>
+        <span class="burger-line burger-bot"></span>
       </button>
     </div>
   </div>
 
-  <div x-show="open" x-transition style="background:var(--bg-deep);border-top:1px solid var(--border);padding:20px 24px 24px;" class="md:hidden">
+  <!-- Мобильное меню -->
+  <div id="nav-mobile-menu" style="background:var(--bg-deep);border-top:1px solid var(--border);padding:20px 24px 24px;">
     <ul style="list-style:none;display:flex;flex-direction:column;gap:4px;margin-bottom:20px;">
-      <li><a href="{% url 'meta:index' %}" @click="open=false" style="display:block;color:var(--text-2);text-decoration:none;font-size:15px;font-weight:500;padding:12px 0;border-bottom:1px solid var(--border);">Тирлист</a></li>
-      <li><a href="{% url 'builds:index' %}" @click="open=false" style="display:block;color:var(--text-2);text-decoration:none;font-size:15px;font-weight:500;padding:12px 0;border-bottom:1px solid var(--border);">Билды</a></li>
-      <li><a href="{% url 'meta:items' %}" @click="open=false" style="display:block;color:var(--text-2);text-decoration:none;font-size:15px;font-weight:500;padding:12px 0;border-bottom:1px solid var(--border);">Предметы</a></li>
-      <li><a href="{% url 'services:index' %}" @click="open=false" style="display:block;color:var(--text-2);text-decoration:none;font-size:15px;font-weight:500;padding:12px 0;border-bottom:1px solid var(--border);">Услуги</a></li>
-      <li><a href="{% url 'services:pro' %}" @click="open=false" style="display:block;color:#c084fc;background:rgba(168,85,247,.14);border:1px solid #a855f7;border-radius:12px;padding:12px 14px;text-decoration:none;font-size:15px;font-weight:700;">PRO</a></li>
-      <li><a href="{% url 'draft:index' %}" @click="open=false" style="display:block;color:var(--text-2);text-decoration:none;font-size:15px;font-weight:500;padding:12px 0;border-bottom:1px solid var(--border);">Драфт</a></li>
-      <li><a href="{% url 'guide:index' %}" @click="open=false" style="display:block;color:var(--text-2);text-decoration:none;font-size:15px;font-weight:500;padding:12px 0;">Гайды</a></li>
+      <li><a href="{% url 'meta:index' %}" onclick="navMenuClose()" style="display:block;color:var(--text-2);text-decoration:none;font-size:15px;font-weight:500;padding:12px 0;border-bottom:1px solid var(--border);">Тирлист</a></li>
+      <li><a href="{% url 'builds:index' %}" onclick="navMenuClose()" style="display:block;color:var(--text-2);text-decoration:none;font-size:15px;font-weight:500;padding:12px 0;border-bottom:1px solid var(--border);">Билды</a></li>
+      <li><a href="{% url 'meta:items' %}" onclick="navMenuClose()" style="display:block;color:var(--text-2);text-decoration:none;font-size:15px;font-weight:500;padding:12px 0;border-bottom:1px solid var(--border);">Предметы</a></li>
+      <li><a href="{% url 'services:index' %}" onclick="navMenuClose()" style="display:block;color:var(--text-2);text-decoration:none;font-size:15px;font-weight:500;padding:12px 0;border-bottom:1px solid var(--border);">Услуги</a></li>
+      <li>
+        {% if user.is_authenticated %}
+        <a href="{% url 'services:my_subscription' %}" onclick="navMenuClose()" style="display:block;color:#c084fc;background:rgba(168,85,247,.14);border:1px solid #a855f7;border-radius:12px;padding:12px 14px;text-decoration:none;font-size:15px;font-weight:700;">PRO</a>
+        {% else %}
+        <a href="{% url 'services:pro' %}" onclick="navMenuClose()" style="display:block;color:#c084fc;background:rgba(168,85,247,.14);border:1px solid #a855f7;border-radius:12px;padding:12px 14px;text-decoration:none;font-size:15px;font-weight:700;">PRO</a>
+        {% endif %}
+      </li>
+      <li><a href="{% url 'draft:index' %}" onclick="navMenuClose()" style="display:block;color:var(--text-2);text-decoration:none;font-size:15px;font-weight:500;padding:12px 0;border-bottom:1px solid var(--border);">Драфт</a></li>
+      <li><a href="{% url 'guide:index' %}" onclick="navMenuClose()" style="display:block;color:var(--text-2);text-decoration:none;font-size:15px;font-weight:500;padding:12px 0;">Гайды</a></li>
     </ul>
     {% if user.is_authenticated %}
-      <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:10px;">
-        <a href="{% url 'services:cart' %}" @click="open=false" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+      <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:20px;">
+        <a href="{% url 'services:cart' %}" onclick="navMenuClose()" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-1);flex-shrink:0;">
             <path d="M6 6h15l-1.5 9h-13z" />
             <path d="M6 6l-2-4H1" />
@@ -89,16 +100,35 @@
           </svg>
           <span style="font-size:14px;color:var(--text-1);font-weight:500;">Корзина</span>
         </a>
-        <a href="{% url 'profile:detail' %}" @click="open=false" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+        <a href="{% url 'profile:detail' %}" onclick="navMenuClose()" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
           <span style="width:34px;height:34px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Russo One',sans-serif;font-size:13px;color:var(--accent);">{{ user.full_name|default:user.email|slice:":1"|upper }}</span>
           <span style="font-size:14px;color:var(--text-1);font-weight:500;">Профиль</span>
         </a>
       </div>
     {% else %}
-      <a href="{% url 'account_signup' %}" class="btn-primary" style="width:100%;justify-content:center;">Зарегистрироваться</a>
+      <a href="{% url 'account_signup' %}" onclick="navMenuClose()" class="btn-primary" style="width:100%;justify-content:center;">Зарегистрироваться</a>
     {% endif %}
   </div>
 
 </nav>
 </header>
 <div style="height:64px;" aria-hidden="true"></div>
+
+<script>
+(function() {
+  var btn  = document.getElementById('nav-burger-btn');
+  var menu = document.getElementById('nav-mobile-menu');
+
+  window.navMenuToggle = function() {
+    var isOpen = menu.classList.toggle('nav-menu-open');
+    btn.classList.toggle('nav-burger-open', isOpen);
+    btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  };
+
+  window.navMenuClose = function() {
+    menu.classList.remove('nav-menu-open');
+    btn.classList.remove('nav-burger-open');
+    btn.setAttribute('aria-expanded', 'false');
+  };
+})();
+</script>

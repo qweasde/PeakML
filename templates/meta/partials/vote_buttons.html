@@ -1,27 +1,32 @@
 {% load static %}
-<div style="display:flex;align-items:center;gap:8px;">
+<div style="display:flex;align-items:center;gap:6px;">
   {% if user.is_authenticated %}
   <button
     hx-post="{% url 'meta:vote' entry.pk %}"
     hx-vals='{"direction": "up"}'
     hx-target="#vote-{{ entry.pk }}"
     hx-swap="innerHTML"
-    style="display:flex;align-items:center;gap:4px;background:{% if user_vote == True %}rgba(127,119,221,0.2){% else %}var(--surface-2){% endif %};border:1px solid {% if user_vote == True %}var(--accent){% else %}var(--border){% endif %};border-radius:6px;padding:5px 10px;color:{% if user_vote == True %}var(--accent){% else %}var(--text-3){% endif %};font-size:12px;cursor:pointer;transition:all 150ms;"
+    style="display:flex;align-items:center;gap:5px;background:{% if user_vote == True %}rgba(74,222,128,.15){% else %}rgba(74,222,128,.05){% endif %};border:1px solid {% if user_vote == True %}rgba(74,222,128,.6){% else %}rgba(74,222,128,.2){% endif %};border-radius:7px;padding:5px 11px;color:{% if user_vote == True %}#4ade80{% else %}rgba(74,222,128,.5){% endif %};font-size:13px;font-weight:700;cursor:pointer;transition:all 150ms;letter-spacing:.02em;"
+    onmouseover="this.style.background='rgba(74,222,128,.15)';this.style.borderColor='rgba(74,222,128,.5)';this.style.color='#4ade80';"
+    onmouseout="this.style.background='{% if user_vote == True %}rgba(74,222,128,.15){% else %}rgba(74,222,128,.05){% endif %}';this.style.borderColor='{% if user_vote == True %}rgba(74,222,128,.6){% else %}rgba(74,222,128,.2){% endif %}';this.style.color='{% if user_vote == True %}#4ade80{% else %}rgba(74,222,128,.5){% endif %}';"
     aria-label="Голос за">
-    ▲ {{ entry.votes_up }}
+    ▲ <span>{{ entry.votes_up }}</span>
   </button>
   <button
     hx-post="{% url 'meta:vote' entry.pk %}"
     hx-vals='{"direction": "down"}'
     hx-target="#vote-{{ entry.pk }}"
     hx-swap="innerHTML"
-    style="display:flex;align-items:center;gap:4px;background:{% if user_vote == False %}rgba(239,68,68,0.1){% else %}var(--surface-2){% endif %};border:1px solid {% if user_vote == False %}rgba(239,68,68,0.4){% else %}var(--border){% endif %};border-radius:6px;padding:5px 10px;color:{% if user_vote == False %}#f87171{% else %}var(--text-3){% endif %};font-size:12px;cursor:pointer;transition:all 150ms;"
+    style="display:flex;align-items:center;gap:5px;background:{% if user_vote == False %}rgba(248,113,113,.15){% else %}rgba(248,113,113,.05){% endif %};border:1px solid {% if user_vote == False %}rgba(248,113,113,.6){% else %}rgba(248,113,113,.2){% endif %};border-radius:7px;padding:5px 11px;color:{% if user_vote == False %}#f87171{% else %}rgba(248,113,113,.5){% endif %};font-size:13px;font-weight:700;cursor:pointer;transition:all 150ms;letter-spacing:.02em;"
+    onmouseover="this.style.background='rgba(248,113,113,.15)';this.style.borderColor='rgba(248,113,113,.5)';this.style.color='#f87171';"
+    onmouseout="this.style.background='{% if user_vote == False %}rgba(248,113,113,.15){% else %}rgba(248,113,113,.05){% endif %}';this.style.borderColor='{% if user_vote == False %}rgba(248,113,113,.6){% else %}rgba(248,113,113,.2){% endif %}';this.style.color='{% if user_vote == False %}#f87171{% else %}rgba(248,113,113,.5){% endif %}';"
     aria-label="Голос против">
-    ▼ {{ entry.votes_down }}
+    ▼ <span>{{ entry.votes_down }}</span>
   </button>
   {% else %}
-  <a href="{% url 'account_login' %}?next={{ request.path }}" style="font-size:12px;color:var(--text-3);text-decoration:none;">
-    ▲ {{ entry.votes_up }} &nbsp; ▼ {{ entry.votes_down }}
+  <a href="{% url 'account_login' %}?next={{ request.path }}" style="display:flex;align-items:center;gap:6px;text-decoration:none;">
+    <span style="font-size:13px;font-weight:700;color:rgba(74,222,128,.4);">▲ {{ entry.votes_up }}</span>
+    <span style="font-size:13px;font-weight:700;color:rgba(248,113,113,.4);">▼ {{ entry.votes_down }}</span>
   </a>
   {% endif %}
 </div>
