@@ -21,17 +21,18 @@
     .tab-btn-idle:hover { color: var(--text-1); }
 
     /* ── Navbar ──────────────────────────────────────────── */
-    /* Десктопная навигация: флекс на 768px+, скрыта на мобиле */
+    /* Скрыто по умолчанию (мобиль) */
     #nav-desktop { display: none; }
+    #nav-burger-btn { display: flex; }
+    .nav-login-desktop, .nav-reg-desktop { display: none; }
+    /* Десктоп 768px+: показываем навигацию, скрываем бургер */
     @media (min-width: 768px) {
       #nav-desktop { display: flex; }
       #nav-burger-btn { display: none !important; }
       .nav-cart, .nav-profile { display: flex !important; }
-      .nav-login-desktop, .nav-reg-desktop { display: inline-flex; }
+      .nav-login-desktop { display: inline; }
+      .nav-reg-desktop { display: inline-flex; }
     }
-    /* Бургер-кнопка: скрыта на десктопе, видна на мобиле */
-    #nav-burger-btn { display: flex; }
-    .nav-login-desktop, .nav-reg-desktop { display: none; }
 
     /* Мобильное меню: скрыто по умолчанию */
     #nav-mobile-menu { display: none; }
@@ -79,13 +80,8 @@
 
       /* Stat-блоки: вертикальный стек без правого бордера */
       .hero-stats { flex-direction: column !important; gap: 0 !important; }
-      .stat-block {
-        padding: 14px 0 !important;
-        border-right: none !important;
-        border-bottom: 1px solid var(--border) !important;
-        width: 100%;
-      }
-      .stat-block:last-child { border-bottom: none !important; }
+      /* stat-block glassmorphism-бейджи: flex-wrap на мобиле */
+      .hero-stats { gap: 8px !important; }
 
       /* Карточки: меньше внутренних отступов */
       .card { padding: 14px !important; }
